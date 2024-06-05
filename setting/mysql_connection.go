@@ -3,23 +3,30 @@ package setting
 import (
 	"fmt"
 
+	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
 	"itmrchow/go-project/user/models"
 )
 
-const (
-	DB_USER = "root"
-	DB_PASS = "abc123!"
-	DB_HOST = "localhost"
-	DB_PORT = "3306"
-	DB_NAME = "Project"
-)
+type Db_Config struct {
+	Host     string
+	Port     int
+	User     string
+	Password string
+	Name     string
+}
 
 func MySqlORMSetting() {
-	formatStr := "%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local"
-	dsn := fmt.Sprintf(formatStr, DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME)
+
+	var config Db_Config
+	if err := viper.UnmarshalKey("mysql", &config); err != nil {
+		panic("read config error: " + err.Error())
+	}
+
+	formatStr := "%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := fmt.Sprintf(formatStr, config.User, config.Password, config.Host, config.Port, config.Name)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {

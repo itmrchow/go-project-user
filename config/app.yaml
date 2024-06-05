@@ -1,0 +1,16 @@
+app:
+  timeout:
+    read: 1000
+    write: 1000
+  port: 8080
+  uploadPath: "./upload"
+  mode: "debug"
+  appId: "go"
+  apiBaseRoute: "/api"
+
+mysql:
+  host: "xxxx"
+  port: 3306
+  user: "xxxx"
+  password: "xxxx"
+  name: "Project"

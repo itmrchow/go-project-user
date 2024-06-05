@@ -20,3 +20,11 @@ viper
 go get github.com/spf13/viper
 
 ```
+
+# goi18n 指令
+```
+goi18n extract -sourceLanguage en
+goi18n merge active.en.toml active.es.toml //產生translate file
+更新translate file後 , 修改檔名active.es.toml
+
+```

@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/viper"
 	"golang.org/x/text/language"
 
-	"itmrchow/go-project/user/routes"
+	"itmrchow/go-project/user/delivery/api"
 	"itmrchow/go-project/user/setting"
 )
 
@@ -17,7 +17,7 @@ func main() {
 
 	setConfig()
 	setting.MySqlORMSetting()
-	routes.Run()
+	api.Run()
 }
 
 func setConfig() {

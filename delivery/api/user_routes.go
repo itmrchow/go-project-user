@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"itmrchow/go-project/user/req_dto"
+	"itmrchow/go-project/user/delivery/api/req_dto"
 
 )
 

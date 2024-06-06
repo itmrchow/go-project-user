@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"itmrchow/go-project/user/resp_dto"
+	"itmrchow/go-project/user/delivery/api/resp_dto"
 )
 
 func addPingRoutes(rg *gin.RouterGroup) {

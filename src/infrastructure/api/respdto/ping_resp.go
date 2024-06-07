@@ -1,4 +1,4 @@
-package resp_dto
+package respdto
 
 type PingResp struct {
 	Msg string `json:"msg"`

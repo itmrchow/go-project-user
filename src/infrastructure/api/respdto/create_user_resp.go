@@ -1,4 +1,4 @@
-package resp_dto
+package respdto
 
 type CreateUserResp struct {
 	Id       string `json:"id"`

@@ -5,8 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"itmrchow/go-project/user/src/infrastructure/api/resp_dto"
+	"itmrchow/go-project/user/src/infrastructure/api/respdto"
 	"itmrchow/go-project/user/src/interfaces/api/controllers"
+
 )
 
 func addPingRoutes(rg *gin.RouterGroup) {
@@ -14,7 +15,7 @@ func addPingRoutes(rg *gin.RouterGroup) {
 
 	rg.GET("/ping", func(c *gin.Context) {
 		respMsg := controller.Ping()
-		data := new(resp_dto.PingResp)
+		data := new(respdto.PingResp)
 		data.Msg = respMsg
 		c.JSON(http.StatusOK, data)
 	})

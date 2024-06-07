@@ -8,7 +8,6 @@ import (
 	"itmrchow/go-project/user/src/infrastructure/api/req_dto"
 	"itmrchow/go-project/user/src/infrastructure/database"
 	"itmrchow/go-project/user/src/interfaces/api/controllers"
-
 )
 
 func addUserRoutes(rg *gin.RouterGroup) {
@@ -35,7 +34,7 @@ func createUser(c *gin.Context) {
 	userController := controllers.NewUserController(database.NewSqlHandler())
 
 	// context to dto
-	userReq := new(req_dto.UserReq) // bind bto
+	userReq := new(req_dto.CreateUserReq) // bind bto
 	c.BindJSON(&userReq)
 
 	// call controller

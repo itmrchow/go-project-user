@@ -1,6 +1,6 @@
 package req_dto
 
-type UserReq struct {
+type CreateUserReq struct {
 	UserName string `json:"userName"`
 	Account  string `json:"account"`
 	Password string `json:"password"`

@@ -14,5 +14,4 @@ func (user *User) CheckFieId() {
 	if user.Account == "" {
 		panic("account is empty")
 	}
-
 }

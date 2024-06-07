@@ -8,7 +8,6 @@ import (
 	"itmrchow/go-project/user/src/infrastructure/database"
 	"itmrchow/go-project/user/src/interfaces/repo_impl"
 	"itmrchow/go-project/user/src/usecase"
-
 )
 
 type UserController struct {
@@ -25,7 +24,7 @@ func NewUserController(handler database.DB_Handler) *UserController {
 
 }
 
-func (controller *UserController) CreateUser(createUserReq *req_dto.UserReq) *resp_dto.UserResp {
+func (controller *UserController) CreateUser(createUserReq *req_dto.CreateUserReq) *resp_dto.UserResp {
 	input := new(usecase.CreateUserInput)
 	input.Account = createUserReq.Account
 	input.Email = createUserReq.Email

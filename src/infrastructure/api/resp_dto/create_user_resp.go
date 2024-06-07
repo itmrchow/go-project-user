@@ -1,9 +1,9 @@
-package req_dto
+package resp_dto
 
-type CreateUserReq struct {
+type CreateUserResp struct {
+	Id       string `json:"id"`
 	UserName string `json:"userName"`
 	Account  string `json:"account"`
-	Password string `json:"password"`
 	Email    string `json:"email"`
 	Phone    string `json:"phone"`
 }

@@ -1,4 +1,4 @@
-package req_dto
+package reqdto
 
 type LoginReq struct {
 	Account  string `json:"account"`

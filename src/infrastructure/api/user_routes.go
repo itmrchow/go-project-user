@@ -5,9 +5,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"itmrchow/go-project/user/src/infrastructure/api/req_dto"
+	"itmrchow/go-project/user/src/infrastructure/api/reqdto"
 	"itmrchow/go-project/user/src/infrastructure/database"
 	"itmrchow/go-project/user/src/interfaces/api/controllers"
+
 )
 
 func addUserRoutes(rg *gin.RouterGroup) {
@@ -32,9 +33,9 @@ func getUser(c *gin.Context) {
 
 func createUser(c *gin.Context) {
 	userController := controllers.NewUserController(database.NewSqlHandler())
-
+	
 	// context to dto
-	userReq := new(req_dto.CreateUserReq) // bind bto
+	userReq := new(reqdto.CreateUserReq) // bind bto
 	c.BindJSON(&userReq)
 
 	// call controller
@@ -44,7 +45,7 @@ func createUser(c *gin.Context) {
 }
 
 func loginUser(c *gin.Context) {
-	loginReq := new(req_dto.LoginReq)
+	loginReq := new(reqdto.LoginReq)
 	// check account
 	isAuth := AuthUser(loginReq.Account, loginReq.Password)
 

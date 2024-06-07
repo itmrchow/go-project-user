@@ -3,11 +3,12 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 
-	"itmrchow/go-project/user/src/infrastructure/api/req_dto"
+	"itmrchow/go-project/user/src/infrastructure/api/reqdto"
 	"itmrchow/go-project/user/src/infrastructure/api/resp_dto"
 	"itmrchow/go-project/user/src/infrastructure/database"
 	"itmrchow/go-project/user/src/interfaces/repo_impl"
 	"itmrchow/go-project/user/src/usecase"
+
 )
 
 type UserController struct {
@@ -24,7 +25,7 @@ func NewUserController(handler database.DB_Handler) *UserController {
 
 }
 
-func (controller *UserController) CreateUser(createUserReq *req_dto.CreateUserReq) *resp_dto.UserResp {
+func (controller *UserController) CreateUser(createUserReq *reqdto.CreateUserReq) *resp_dto.CreateUserResp {
 	input := new(usecase.CreateUserInput)
 	input.Account = createUserReq.Account
 	input.Email = createUserReq.Email
@@ -43,7 +44,7 @@ func (controller *UserController) CreateUser(createUserReq *req_dto.CreateUserRe
 
 	// c.JSON(http.StatusOK, gin.H{"msg": "success"})
 
-	return &resp_dto.UserResp{
+	return &resp_dto.CreateUserResp{
 		Id:       out.Id,
 		UserName: out.UserName,
 		Account:  out.Account,

@@ -1,12 +1,13 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
-	"itmrchow/go-project/user/delivery/api/req_dto"
+	"itmrchow/go-project/user/src/infrastructure/api/req_dto"
+	"itmrchow/go-project/user/src/infrastructure/database"
+	"itmrchow/go-project/user/src/interfaces/api/controllers"
 
 )
 
@@ -31,13 +32,16 @@ func getUser(c *gin.Context) {
 }
 
 func createUser(c *gin.Context) {
-	userReq := new(req_dto.UserReq)
+	userController := controllers.NewUserController(database.NewSqlHandler())
+
+	// context to dto
+	userReq := new(req_dto.UserReq) // bind bto
 	c.BindJSON(&userReq)
 
-	fmt.Println(userReq)
-	// create user
+	// call controller
+	response := userController.CreateUser(userReq)
 
-	c.JSON(http.StatusOK, gin.H{"msg": "success"})
+	c.JSON(http.StatusOK, response)
 }
 
 func loginUser(c *gin.Context) {

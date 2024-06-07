@@ -1,4 +1,4 @@
-package setting
+package database
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
-	"itmrchow/go-project/user/models"
+	"itmrchow/go-project/user/src/domain"
 )
 
 type Db_Config struct {
@@ -18,8 +18,11 @@ type Db_Config struct {
 	Name     string
 }
 
-func MySqlORMSetting() {
+type DB_Handler struct {
+	DB *gorm.DB
+}
 
+func NewSqlHandler() DB_Handler {
 	var config Db_Config
 	if err := viper.UnmarshalKey("mysql", &config); err != nil {
 		panic("read config error: " + err.Error())
@@ -33,8 +36,12 @@ func MySqlORMSetting() {
 		panic("gorm connection error: " + err.Error())
 	}
 
-	if err := db.AutoMigrate(new(models.User)); err != nil {
+	if err := db.AutoMigrate(new(domain.User)); err != nil {
 		panic("gorm migration error: " + err.Error())
 	}
 
+	handler := new(DB_Handler)
+	handler.DB = db
+
+	return *handler
 }

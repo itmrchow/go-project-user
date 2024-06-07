@@ -29,11 +29,35 @@ goi18n merge active.en.toml active.es.toml //產生translate file
 
 ```
 
+# Go Style Decisions
+https://google.github.io/styleguide/go/decisions.html
+
 # Clean Architecture
 
+1. Entities - 核心邏輯
+   1. domain
+2. Use Cases - 商業邏輯
+   1. usecase
+3. Interface Adapters - 對外界面來呼叫Use case
+   1. api
+      1. context (API response format)
+      2. controller (呼叫Usecase)
+   2. db
+      1. repo ()
+      2. repoImpl
+4. Frameworks and Drivers - 框架，資料庫等等的把程式串起來的東西
+   1. router
+   2. db_handler (資料庫連線)
 
+# Todo
+- [ ] swagger
+- [ ] sturct to sturct
+- [ ] UUID
+- [ ] response format
 
 
 # 參考
 https://ithelp.ithome.com.tw/users/20120647/ironman/3110
 https://dongstudio.medium.com/clean-architecture-%E4%BA%8C-%E6%95%B4%E6%BD%94%E5%BC%8F%E6%9E%B6%E6%A7%8B-be4010ee62d4
+https://github.com/bxcodec/go-clean-arch?tab=readme-ov-file
+https://dev.to/michinoins/building-a-crud-app-with-mysql-gorm-echo-and-clean-architecture-in-go-h6d

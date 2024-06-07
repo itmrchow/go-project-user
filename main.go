@@ -8,15 +8,16 @@ import (
 	"github.com/spf13/viper"
 	"golang.org/x/text/language"
 
-	"itmrchow/go-project/user/delivery/api"
-	"itmrchow/go-project/user/setting"
+	"itmrchow/go-project/user/src/infrastructure/api"
+	setting "itmrchow/go-project/user/src/infrastructure/database"
 )
 
 func main() {
 	setI18n()
-
 	setConfig()
-	setting.MySqlORMSetting()
+	setting.NewSqlHandler()
+
+	// dbHander := setting.NewSqlHandler()
 	api.Run()
 }
 

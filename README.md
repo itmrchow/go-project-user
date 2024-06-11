@@ -38,22 +38,24 @@ https://google.github.io/styleguide/go/decisions.html
    1. domain
 2. Use Cases - 商業邏輯
    1. usecase
+   2. repo - 資料操作介面
 3. Interface Adapters - 對外界面來呼叫Use case
    1. api
       1. context (API response format)
       2. controller (呼叫Usecase)
    2. db
-      1. repo ()
-      2. repoImpl
+      1. repo_impl
 4. Frameworks and Drivers - 框架，資料庫等等的把程式串起來的東西
    1. router
    2. db_handler (資料庫連線)
 
 # Todo
 - [ ] swagger
+- [ ] wire
 - [ ] sturct to sturct
 - [ ] UUID
 - [ ] response format
+- [ ] error handle
 
 
 # 參考

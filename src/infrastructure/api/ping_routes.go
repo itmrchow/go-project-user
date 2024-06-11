@@ -19,8 +19,8 @@ import (
 // @Accept json
 // @Produce json
 // @Success 200 {string} Helloworld
-// @Router /example/helloworld [get]
-func addPingRoutes(rg *gin.RouterGroup) {
+// @Router /helloworld [get]
+func addExampleRoutes(rg *gin.RouterGroup) {
 	controller := controllers.NewPingController()
 
 	rg.GET("/ping", func(c *gin.Context) {

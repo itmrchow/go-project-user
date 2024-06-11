@@ -1,5 +1,63 @@
+definitions:
+  reqdto.CreateUserReq:
+    properties:
+      account:
+        example: jeff7777
+        type: string
+      email:
+        example: jeff@gmail.com
+        type: string
+      password:
+        example: jeffpwd
+        type: string
+      phone:
+        example: "+886955555555"
+        type: string
+      userName:
+        example: Jeff
+        type: string
+    type: object
+  reqdto.PatchUserReq:
+    properties:
+      account:
+        example: jeff7777
+        type: string
+      email:
+        example: jeff@gmail.com
+        type: string
+      password:
+        example: jeffpwd
+        type: string
+      phone:
+        example: "+886955555555"
+        type: string
+      userName:
+        example: Jeff
+        type: string
+    type: object
+  reqdto.PutUserReq:
+    properties:
+      account:
+        example: jeff7777
+        type: string
+      email:
+        example: jeff@gmail.com
+        type: string
+      password:
+        example: jeffpwd
+        type: string
+      phone:
+        example: "+886955555555"
+        type: string
+      userName:
+        example: Jeff
+        type: string
+    type: object
 info:
   contact: {}
+  description: User Service API
+  title: User Service API
+  version: "1.0"
 paths:
   /helloworld:
     get:
@@ -13,7 +71,225 @@ paths:
           description: OK
           schema:
             type: string
-      summary: ping example
+      summary: HelloWorld example
       tags:
-      - example
+      - Example
+  /login:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok" "返回用户信息
+          schema:
+            type: string
+        "400":
+          description: err_code：10002 参数错误； err_code：10003 校验错误
+          schema:
+            type: string
+        "401":
+          description: err_code：10001 登录失败
+          schema:
+            type: string
+      summary: 登入
+      tags:
+      - User
+  /ping:
+    get:
+      consumes:
+      - application/json
+      description: 確認服務正常
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Ping Server
+      tags:
+      - Example
+  /user:
+    post:
+      parameters:
+      - description: Create user sample
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/reqdto.CreateUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok" "返回用户信息
+          schema:
+            type: string
+        "400":
+          description: err_code：10002 参数错误； err_code：10003 校验错误
+          schema:
+            type: string
+        "401":
+          description: err_code：10001 登录失败
+          schema:
+            type: string
+      summary: 建立用戶
+      tags:
+      - User
+  /user/{userId}:
+    delete:
+      parameters:
+      - description: User Id
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok" "返回用户信息
+          schema:
+            type: string
+        "400":
+          description: err_code：10002 参数错误； err_code：10003 校验错误
+          schema:
+            type: string
+        "401":
+          description: err_code：10001 登录失败
+          schema:
+            type: string
+      summary: 刪除用戶 by Id
+      tags:
+      - User
+    get:
+      parameters:
+      - description: User Id
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok" "返回用户信息
+          schema:
+            type: string
+        "400":
+          description: err_code：10002 参数错误； err_code：10003 校验错误
+          schema:
+            type: string
+        "401":
+          description: err_code：10001 登录失败
+          schema:
+            type: string
+      summary: 查詢用戶 by Id
+      tags:
+      - User
+    patch:
+      parameters:
+      - description: User Id
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Patch user sample
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/reqdto.PatchUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok" "返回用户信息
+          schema:
+            type: string
+        "400":
+          description: err_code：10002 参数错误； err_code：10003 校验错误
+          schema:
+            type: string
+        "401":
+          description: err_code：10001 登录失败
+          schema:
+            type: string
+      summary: 部分更新用戶 by Id
+      tags:
+      - User
+    put:
+      parameters:
+      - description: User Id
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Put user sample
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/reqdto.PutUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok" "返回用户信息
+          schema:
+            type: string
+        "400":
+          description: err_code：10002 参数错误； err_code：10003 校验错误
+          schema:
+            type: string
+        "401":
+          description: err_code：10001 登录失败
+          schema:
+            type: string
+      summary: 完整更新用戶 by Id
+      tags:
+      - User
+  /users:
+    get:
+      parameters:
+      - description: User Name
+        in: query
+        name: userName
+        type: string
+      - description: User Email
+        in: query
+        name: email
+        type: string
+      - description: User Phone
+        in: query
+        name: phone
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok" "返回用户信息
+          schema:
+            type: string
+        "400":
+          description: err_code：10002 参数错误； err_code：10003 校验错误
+          schema:
+            type: string
+        "401":
+          description: err_code：10001 登录失败
+          schema:
+            type: string
+      summary: 查詢用戶
+      tags:
+      - User
+securityDefinitions:
+  BasicAuth:
+    type: basic
 swagger: "2.0"
+tags:
+- description: User API
+  name: User
+- description: Example API
+  name: Example
+- description: Other description
+  name: Other

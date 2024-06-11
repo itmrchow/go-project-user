@@ -12,6 +12,19 @@ import (
 	setting "itmrchow/go-project/user/src/infrastructure/database"
 )
 
+// @title           User Service API
+// @version         1.0
+// @description     User Service API
+
+// @securityDefinitions.basic  BasicAuth
+
+// @tag.name User
+// @tag.description User API
+// @tag.name Example
+// @tag.description Example API
+// @tag.name Other
+// @tag.description Other description
+
 func main() {
 	setI18n()
 	setConfig()

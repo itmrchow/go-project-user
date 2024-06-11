@@ -9,14 +9,6 @@ import (
 
 )
 
-// @title           User service API
-// @version         1.0
-// @description     User service
-
-// @host      localhost:8080
-
-// @securityDefinitions.basic  BasicAuth
-
 var router = gin.Default()
 
 func Run() {
@@ -32,6 +24,7 @@ func getRoutes() {
 
 	docs.SwaggerInfo.BasePath = apiV1.BasePath()
 
+	//
 	// Example
 	addExampleRoutes(apiV1)
 

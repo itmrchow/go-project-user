@@ -1,6 +1,6 @@
 package reqdto
 
-type CreateUserReq struct {
+type PutUserReq struct {
 	UserName string `json:"userName" example:"Jeff"`
 	Account  string `json:"account" example:"jeff7777"`
 	Password string `json:"password" example:"jeffpwd"`

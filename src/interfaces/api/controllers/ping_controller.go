@@ -14,3 +14,7 @@ func NewPingController() *PingController {
 func (controller *PingController) Ping() string {
 	return controller.pingService.Ping()
 }
+
+func (controller *PingController) GetHelloWorld() string {
+	return "HelloWorld"
+}

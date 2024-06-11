@@ -19,6 +19,11 @@ go get -u gorm.io/driver/mysql
 viper
 go get github.com/spf13/viper
 
+swagger
+go install github.com/swaggo/swag/cmd/swag@latest
+go get -u github.com/swaggo/gin-swagger
+go get -u github.com/swaggo/files
+
 ```
 
 # goi18n 指令
@@ -48,6 +53,12 @@ https://google.github.io/styleguide/go/decisions.html
 4. Frameworks and Drivers - 框架，資料庫等等的把程式串起來的東西
    1. router
    2. db_handler (資料庫連線)
+
+# swagger
+```
+swag init
+
+```
 
 # Todo
 - [ ] swagger

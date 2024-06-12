@@ -3,19 +3,31 @@ definitions:
     properties:
       account:
         example: jeff7777
+        maxLength: 20
+        minLength: 8
         type: string
       email:
         example: jeff@gmail.com
         type: string
       password:
-        example: jeffpwd
+        example: password
+        maxLength: 20
+        minLength: 8
         type: string
       phone:
         example: "+886955555555"
         type: string
       userName:
         example: Jeff
+        maxLength: 20
+        minLength: 4
         type: string
+    required:
+    - account
+    - email
+    - password
+    - phone
+    - userName
     type: object
   reqdto.PatchUserReq:
     properties:

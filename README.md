@@ -24,6 +24,9 @@ go install github.com/swaggo/swag/cmd/swag@latest
 go get -u github.com/swaggo/gin-swagger
 go get -u github.com/swaggo/files
 
+UUID
+go get github.com/google/uuid
+
 ```
 
 # goi18n 指令
@@ -39,20 +42,21 @@ https://google.github.io/styleguide/go/decisions.html
 
 # Clean Architecture
 
-1. Entities - 核心邏輯
-   1. domain
-2. Use Cases - 商業邏輯
-   1. usecase
-   2. repo - 資料操作介面
-3. Interface Adapters - 對外界面來呼叫Use case
-   1. api
-      1. context (API response format)
-      2. controller (呼叫Usecase)
-   2. db
-      1. repo_impl
-4. Frameworks and Drivers - 框架，資料庫等等的把程式串起來的東西
-   1. router
-   2. db_handler (資料庫連線)
+- Entities - 核心邏輯
+   - domain
+     - helper - 簡單方法,不含狀態
+- Use Cases - 商業邏輯
+   - usecase
+   - repo - 資料操作介面
+- Interface Adapters - 對外界面來呼叫Use case
+   - api
+      - context (API response format)
+      - controller (呼叫Usecase)
+   - db
+      - repo_impl
+- Frameworks and Drivers - 框架，資料庫等等的把程式串起來的東西
+   - router
+   - db_handler (資料庫連線)
 
 # swagger
 ```

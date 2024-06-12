@@ -361,9 +361,18 @@ const docTemplate = `{
     "definitions": {
         "reqdto.CreateUserReq": {
             "type": "object",
+            "required": [
+                "account",
+                "email",
+                "password",
+                "phone",
+                "userName"
+            ],
             "properties": {
                 "account": {
                     "type": "string",
+                    "maxLength": 20,
+                    "minLength": 8,
                     "example": "jeff7777"
                 },
                 "email": {
@@ -372,7 +381,9 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string",
-                    "example": "jeffpwd"
+                    "maxLength": 20,
+                    "minLength": 8,
+                    "example": "password"
                 },
                 "phone": {
                     "type": "string",
@@ -380,6 +391,8 @@ const docTemplate = `{
                 },
                 "userName": {
                     "type": "string",
+                    "maxLength": 20,
+                    "minLength": 4,
                     "example": "Jeff"
                 }
             }

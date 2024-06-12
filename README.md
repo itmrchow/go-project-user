@@ -59,16 +59,14 @@ https://google.github.io/styleguide/go/decisions.html
    - db_handler (資料庫連線)
 
 # swagger
-```
-swag init
-
-```
+https://github.com/go-swagger/go-swagger
+https://github.com/swaggo/gin-swagger/tree/master
 
 # Todo
-- [ ] swagger
+- [x] swagger
+- [x] UUID
 - [ ] wire
 - [ ] sturct to sturct
-- [ ] UUID
 - [ ] response format
 - [ ] error handle
 

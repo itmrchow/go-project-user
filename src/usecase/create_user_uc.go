@@ -3,7 +3,6 @@ package usecase
 import (
 	"itmrchow/go-project/user/src/domain"
 	"itmrchow/go-project/user/src/usecase/repo"
-
 )
 
 // 定義input

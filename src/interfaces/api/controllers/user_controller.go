@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"github.com/gin-gonic/gin"
-
 	"itmrchow/go-project/user/src/infrastructure/api/reqdto"
 	"itmrchow/go-project/user/src/infrastructure/api/respdto"
 	"itmrchow/go-project/user/src/infrastructure/database"
@@ -12,16 +10,19 @@ import (
 
 type UserController struct {
 	createUserUC usecase.CreateUserUseCase
+	getUserUC    usecase.GetUserUseCase
 }
 
-// 建構
 func NewUserController(handler database.DB_Handler) *UserController {
 
 	userRepo := repo_impl.NewUserRepoImpl(handler)
 	createUserUC := usecase.NewCreateUserUseCase(userRepo)
+	getUserUC := usecase.NewGetUserUseCase(userRepo)
 
-	return &UserController{createUserUC: createUserUC}
-
+	return &UserController{
+		createUserUC: createUserUC,
+		getUserUC:    getUserUC,
+	}
 }
 
 func (controller *UserController) CreateUser(createUserReq *reqdto.CreateUserReq) *respdto.CreateUserResp {
@@ -52,7 +53,15 @@ func (controller *UserController) CreateUser(createUserReq *reqdto.CreateUserReq
 	}
 }
 
-func (controller *UserController) GetUser(c *gin.Context) {
-	// Context 轉DTO
-	//
+func (controller *UserController) GetUser(userId string) *respdto.GetUserResp {
+
+	out := controller.getUserUC.GetUser(userId)
+
+	return &respdto.GetUserResp{
+		Id:       out.Id,
+		UserName: out.UserName,
+		Account:  out.Account,
+		Email:    out.Email,
+		Phone:    out.Phone,
+	}
 }

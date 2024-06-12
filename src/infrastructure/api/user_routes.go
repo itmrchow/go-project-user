@@ -88,6 +88,7 @@ func putUser(c *gin.Context, userController *controllers.UserController) {
 // @Failure 401 {string} string "err_code：10001 登录失败"
 // @Router /users [GET]
 func getUsers(c *gin.Context, controller *controllers.UserController) {
+
 	panic("unimplemented")
 }
 
@@ -101,10 +102,9 @@ func getUsers(c *gin.Context, controller *controllers.UserController) {
 // @Router /user/{userId} [get]
 func getUser(c *gin.Context, controller *controllers.UserController) {
 	userId := c.Param("userId")
+	resp := controller.GetUser(userId)
 
-	// query by userId
-
-	c.JSON(http.StatusOK, gin.H{"hello": userId})
+	c.JSON(http.StatusOK, resp)
 }
 
 // @Summary 建立用戶

@@ -14,3 +14,4 @@ mysql:
   user: "xxxx"
   password: "xxxx"
   name: "Project"
+  isShowLog: false

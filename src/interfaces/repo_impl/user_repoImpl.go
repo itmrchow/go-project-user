@@ -1,13 +1,8 @@
 package repo_impl
 
 import (
-	"errors"
-
-	"gorm.io/gorm"
-
 	"itmrchow/go-project/user/src/domain"
 	"itmrchow/go-project/user/src/infrastructure/database"
-
 )
 
 type UserRepoImpl struct {
@@ -28,13 +23,7 @@ func (u UserRepoImpl) Get(userId string) (*domain.User, error) {
 	var user = domain.User{Id: userId}
 	result := u.handler.DB.First(&user)
 
-	if result.Error == nil {
-		return &user, nil
-	} else if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, nil
-	} else {
-		return nil, result.Error
-	}
+	return &user, result.Error
 }
 
 func (u UserRepoImpl) ExistsByAccountOrEmailOrPhone(account string, email string, phone string) (bool, error) {

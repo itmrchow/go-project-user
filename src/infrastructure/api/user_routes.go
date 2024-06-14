@@ -102,7 +102,7 @@ func getUsers(c *gin.Context, controller *controllers.UserController) {
 // @Router /user/{userId} [get]
 func getUser(c *gin.Context, controller *controllers.UserController) {
 	userId := c.Param("userId")
-	resp := controller.GetUser(userId)
+	resp, _ := controller.GetUser(userId)
 
 	c.JSON(http.StatusOK, resp)
 }

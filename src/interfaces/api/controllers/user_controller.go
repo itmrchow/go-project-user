@@ -10,8 +10,8 @@ import (
 )
 
 type UserController struct {
-	createUserUC usecase.CreateUserUseCase
-	getUserUC    usecase.GetUserUseCase
+	createUserUC *usecase.CreateUserUseCase
+	getUserUC    *usecase.GetUserUseCase
 }
 
 func NewUserController(handler database.DB_Handler) *UserController {
@@ -47,9 +47,13 @@ func (controller *UserController) CreateUser(createUserReq *reqdto.CreateUserReq
 	}
 }
 
-func (controller *UserController) GetUser(userId string) *respdto.GetUserResp {
+func (controller *UserController) GetUser(userId string) (*respdto.GetUserResp, error) {
 
-	out := controller.getUserUC.GetUser(userId)
+	out, err := controller.getUserUC.GetUser(userId)
+
+	if out == nil {
+		return nil, err
+	}
 
 	return &respdto.GetUserResp{
 		Id:       out.Id,
@@ -57,5 +61,5 @@ func (controller *UserController) GetUser(userId string) *respdto.GetUserResp {
 		Account:  out.Account,
 		Email:    out.Email,
 		Phone:    out.Phone,
-	}
+	}, nil
 }

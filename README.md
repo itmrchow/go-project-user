@@ -27,6 +27,9 @@ go get -u github.com/swaggo/files
 UUID
 go get github.com/google/uuid
 
+unit test - testify
+go get github.com/stretchr/testify
+
 ```
 
 # goi18n 指令
@@ -62,9 +65,15 @@ https://google.github.io/styleguide/go/decisions.html
 https://github.com/go-swagger/go-swagger
 https://github.com/swaggo/gin-swagger/tree/master
 
+# unit test
+## testifi - assert & mock 工具包
+https://github.com/stretchr/testify
+## mockery - 快速產生介面相對應的mock
+
 # Todo
 - [x] swagger
 - [x] UUID
+- [x] unit test
 - [ ] wire
 - [ ] sturct to sturct
 - [ ] response format

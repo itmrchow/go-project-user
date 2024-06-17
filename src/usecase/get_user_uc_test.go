@@ -12,7 +12,7 @@ import (
 	"itmrchow/go-project/user/src/usecase/repo"
 )
 
-func TestSuite(t *testing.T) {
+func TestGetUserSuite(t *testing.T) {
 	suite.Run(t, new(GetUserUCTestSuite))
 }
 

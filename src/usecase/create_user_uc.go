@@ -8,7 +8,6 @@ import (
 	"itmrchow/go-project/user/src/domain"
 	"itmrchow/go-project/user/src/usecase/handler"
 	"itmrchow/go-project/user/src/usecase/repo"
-
 )
 
 // 定義input
@@ -34,8 +33,8 @@ type CreateUserUseCase struct {
 	encryptionHandler handler.EncryptionHandler
 }
 
-func NewCreateUserUseCase(userRepo repo.UserRepo, encryptionHandler handler.EncryptionHandler) CreateUserUseCase {
-	return CreateUserUseCase{userRepo: userRepo, encryptionHandler: encryptionHandler}
+func NewCreateUserUseCase(userRepo repo.UserRepo, encryptionHandler handler.EncryptionHandler) *CreateUserUseCase {
+	return &CreateUserUseCase{userRepo: userRepo, encryptionHandler: encryptionHandler}
 }
 
 func (c CreateUserUseCase) CreateUser(input CreateUserInput) (*CreateUserOutput, error) {
@@ -51,7 +50,10 @@ func (c CreateUserUseCase) CreateUser(input CreateUserInput) (*CreateUserOutput,
 	uuidStr := uuid.New().String()
 
 	// 3. hash password
-	hashStr, _ := c.encryptionHandler.HashPassword(input.Password)
+	hashStr, hashErr := c.encryptionHandler.HashPassword(input.Password)
+	if hashErr != nil {
+		return nil, hashErr
+	}
 
 	// 4. 寫入資料庫
 	userModel := &domain.User{

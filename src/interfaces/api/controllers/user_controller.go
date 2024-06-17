@@ -10,7 +10,7 @@ import (
 )
 
 type UserController struct {
-	createUserUC usecase.CreateUserUseCase
+	createUserUC *usecase.CreateUserUseCase
 	getUserUC    *usecase.GetUserUseCase
 }
 

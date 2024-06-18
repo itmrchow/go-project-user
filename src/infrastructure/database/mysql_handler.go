@@ -11,48 +11,72 @@ import (
 	"itmrchow/go-project/user/src/domain"
 )
 
-type Db_Config struct {
-	Host     string
-	Port     int
-	User     string
-	Password string
-	Name     string
+const (
+	ViperKey          = "mysql"
+	ViperIsShowLogKey = "mysql.isShowLog"
+	DnsStr            = "%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local"
+)
+
+type DbConfig struct {
+	Host      string
+	Port      int
+	User      string
+	Password  string
+	Name      string
+	IsShowLog bool
 }
 
-type DB_Handler struct {
-	DB *gorm.DB
+type MysqlHandler struct {
+	DB     *gorm.DB
+	config DbConfig
 }
 
-func NewSqlHandler() DB_Handler {
-	var config Db_Config
-	if err := viper.UnmarshalKey("mysql", &config); err != nil {
+func NewMySqlHandler() (*MysqlHandler, error) {
+
+	handler := MysqlHandler{}
+	err := handler.Connect()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &handler, nil
+}
+
+func (h *MysqlHandler) Connect() error {
+
+	if err := viper.UnmarshalKey(ViperKey, &h.config); err != nil {
 		panic("read config error: " + err.Error())
 	}
 
-	dsnStr := "%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local"
-	dsn := fmt.Sprintf(dsnStr, config.User, config.Password, config.Host, config.Port, config.Name)
+	h.config.IsShowLog = viper.GetBool(ViperIsShowLogKey)
 
-	isShowLog := viper.GetBool("mysql.isShowLog")
+	dsn := fmt.Sprintf(
+		DnsStr,
+		h.config.User,
+		h.config.Password,
+		h.config.Host,
+		h.config.Port,
+		h.config.Name,
+	)
 
 	db, err := gorm.Open(
 		mysql.Open(dsn),
 		&gorm.Config{
-			Logger: getLogger(isShowLog),
+			Logger: getLogger(h.config.IsShowLog),
 		},
 	)
 
 	if err != nil {
-		panic("gorm connection error: " + err.Error())
+		return err
+	} else {
+		h.DB = db
+		return nil
 	}
+}
 
-	if err := db.AutoMigrate(new(domain.User)); err != nil {
-		panic("gorm migration error: " + err.Error())
-	}
-
-	handler := new(DB_Handler)
-	handler.DB = db
-
-	return *handler
+func (m *MysqlHandler) Migrate() error {
+	return m.DB.AutoMigrate(new(domain.User))
 }
 
 func getLogger(isShowLog bool) logger.Interface {

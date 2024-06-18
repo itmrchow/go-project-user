@@ -5,15 +5,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"itmrchow/go-project/user/config"
 	"itmrchow/go-project/user/src/infrastructure/api/reqdto"
-	"itmrchow/go-project/user/src/infrastructure/database"
 	"itmrchow/go-project/user/src/interfaces/api/controllers"
 )
 
 func addUserRoutes(rg *gin.RouterGroup) {
 
-	// create controller
-	userController := controllers.NewUserController(database.NewSqlHandler())
+	userController, _ := config.InitUserController()
 
 	// user API
 	rg.GET("/user/:userId", func(c *gin.Context) {

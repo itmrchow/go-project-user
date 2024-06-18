@@ -6,10 +6,10 @@ import (
 )
 
 type UserRepoImpl struct {
-	handler database.DB_Handler
+	handler *database.MysqlHandler
 }
 
-func NewUserRepoImpl(handler database.DB_Handler) UserRepoImpl {
+func NewUserRepoImpl(handler *database.MysqlHandler) UserRepoImpl {
 	return UserRepoImpl{
 		handler: handler,
 	}

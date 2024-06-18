@@ -14,7 +14,7 @@ type UserController struct {
 	getUserUC    *usecase.GetUserUseCase
 }
 
-func NewUserController(handler database.DB_Handler) *UserController {
+func NewUserController(handler *database.MysqlHandler) *UserController {
 
 	userRepo := repo_impl.NewUserRepoImpl(handler)
 	encryptionHandler := new(handlerimpl.BcryptHandler)

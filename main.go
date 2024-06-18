@@ -9,7 +9,6 @@ import (
 	"golang.org/x/text/language"
 
 	"itmrchow/go-project/user/src/infrastructure/api"
-	setting "itmrchow/go-project/user/src/infrastructure/database"
 )
 
 // @title           User Service API
@@ -28,7 +27,7 @@ import (
 func main() {
 	setI18n()
 	setConfig()
-	setting.NewSqlHandler()
+	// mysqlHandler := setMysqlDB()
 
 	// dbHander := setting.NewSqlHandler()
 	api.Run()
@@ -42,7 +41,6 @@ func setConfig() {
 	if err := viper.ReadInConfig(); err != nil {
 		panic("read config error: " + err.Error())
 	}
-
 }
 
 func setI18n() {

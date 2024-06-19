@@ -20,6 +20,7 @@ func ErrorHandle() gin.HandlerFunc {
 		err := c.Errors[0]
 		var status int
 
+		var errResp = respdto.ApiErrorResp{}
 		// 轉換 API error & Domain error
 
 		switch err.Type {
@@ -31,8 +32,10 @@ func ErrorHandle() gin.HandlerFunc {
 			status = http.StatusInternalServerError
 		default:
 			status = http.StatusInternalServerError
+			errResp.Title = "Other Error"
+			errResp.Detail = err.Error()
 		}
 
-		c.JSON(status, respdto.ApiErrorResp{})
+		c.JSON(status, errResp)
 	}
 }

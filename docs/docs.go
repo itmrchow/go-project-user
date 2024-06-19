@@ -457,11 +457,6 @@ const docTemplate = `{
         "respdto.ApiErrorResp": {
             "type": "object",
             "properties": {
-                "Error": {
-                    "description": "內部標示符 -\u003e 對應到內部error的相關info",
-                    "type": "object",
-                    "additionalProperties": true
-                },
                 "detail": {
                     "description": "問題描述",
                     "type": "string"

@@ -68,10 +68,6 @@ definitions:
     type: object
   respdto.ApiErrorResp:
     properties:
-      Error:
-        additionalProperties: true
-        description: 內部標示符 -> 對應到內部error的相關info
-        type: object
       detail:
         description: 問題描述
         type: string

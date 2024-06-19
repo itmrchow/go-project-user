@@ -11,7 +11,7 @@ func NewPingController() *PingController {
 	return &PingController{service}
 }
 
-func (controller *PingController) Ping() string {
+func (controller *PingController) Ping() (string, error) {
 	return controller.pingService.Ping()
 }
 

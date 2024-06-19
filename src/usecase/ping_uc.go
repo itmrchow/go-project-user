@@ -1,12 +1,14 @@
 package usecase
 
+import "errors"
+
 type PingService interface {
-	Ping() string
+	Ping() (string, error)
 }
 
 type PingServiceImpl struct {
 }
 
-func (p *PingServiceImpl) Ping() string {
-	return "pong"
+func (p *PingServiceImpl) Ping() (string, error) {
+	return "pong", errors.New("new jeff error")
 }

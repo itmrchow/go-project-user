@@ -1,7 +1,7 @@
 package reqdto
 
 type CreateUserReq struct {
-	UserName string `json:"userName" example:"Jeff" binding:"required,min=4,max=20"`
+	UserName string `json:"userName" example:"Jeff" binding:"required,min=4,max=20"` // 使用者名稱
 	Account  string `json:"account" example:"jeff7777" binding:"required,min=8,max=20"`
 	Password string `json:"password" example:"password" binding:"required,min=8,max=20"`
 	Email    string `json:"email" example:"jeff@gmail.com" binding:"required,email"`

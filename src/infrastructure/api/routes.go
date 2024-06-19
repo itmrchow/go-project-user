@@ -6,12 +6,13 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"itmrchow/go-project/user/docs"
-
 )
 
 var router = gin.Default()
 
 func Run() {
+
+	router.Use(ErrorHandle())
 
 	getRoutes()
 

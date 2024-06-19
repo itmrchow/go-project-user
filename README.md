@@ -65,6 +65,11 @@ https://google.github.io/styleguide/go/decisions.html
 https://github.com/go-swagger/go-swagger
 https://github.com/swaggo/gin-swagger/tree/master
 
+```
+生產doc 指令
+swag init 
+```
+
 # unit test
 ## testifi - assert & mock 工具包
 https://github.com/stretchr/testify
@@ -228,7 +233,23 @@ var Set = wire.NewSet(
 
 ```
 
-### 結構提供者 
+# 錯誤處理
+參考: https://ken00535.medium.com/go-error-handling-ebbd204bcdb4
+
+
+# response format 
+
+
+
+
+領域Error & API Error 
+- 領域Error
+- API Error: 接口端發生錯誤
+
+## 參考
+https://ken00535.medium.com/go-error-handling-ebbd204bcdb4
+
+
 
 
 
@@ -248,3 +269,4 @@ https://ithelp.ithome.com.tw/users/20120647/ironman/3110
 https://dongstudio.medium.com/clean-architecture-%E4%BA%8C-%E6%95%B4%E6%BD%94%E5%BC%8F%E6%9E%B6%E6%A7%8B-be4010ee62d4
 https://github.com/bxcodec/go-clean-arch?tab=readme-ov-file
 https://dev.to/michinoins/building-a-crud-app-with-mysql-gorm-echo-and-clean-architecture-in-go-h6d
+https://ken00535.medium.com/go-error-handling-ebbd204bcdb4

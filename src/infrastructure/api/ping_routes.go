@@ -25,10 +25,17 @@ func addExampleRoutes(rg *gin.RouterGroup) {
 // @Tags Example
 // @Accept json
 // @Produce json
-// @Success 200 {string} pong
+// @Success 200 {string} string "pong"
+// @response default {object} respdto.ApiErrorResp "error response"
 // @Router /ping [get]
 func getPingHandler(c *gin.Context, controller *controllers.PingController) {
-	respMsg := controller.Ping()
+	respMsg, err := controller.Ping()
+
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
 	data := new(respdto.PingResp)
 	data.Msg = respMsg
 	c.JSON(http.StatusOK, data)

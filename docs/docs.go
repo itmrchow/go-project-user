@@ -84,9 +84,15 @@ const docTemplate = `{
                 "summary": "Ping Server",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "pong",
                         "schema": {
                             "type": "string"
+                        }
+                    },
+                    "default": {
+                        "description": "error response",
+                        "schema": {
+                            "$ref": "#/definitions/respdto.ApiErrorResp"
                         }
                     }
                 }
@@ -390,6 +396,7 @@ const docTemplate = `{
                     "example": "+886955555555"
                 },
                 "userName": {
+                    "description": "使用者名稱",
                     "type": "string",
                     "maxLength": 20,
                     "minLength": 4,
@@ -444,6 +451,24 @@ const docTemplate = `{
                 "userName": {
                     "type": "string",
                     "example": "Jeff"
+                }
+            }
+        },
+        "respdto.ApiErrorResp": {
+            "type": "object",
+            "properties": {
+                "Error": {
+                    "description": "內部標示符 -\u003e 對應到內部error的相關info",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "detail": {
+                    "description": "問題描述",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "Type     string ` + "`" + `json:\"type,omitempty\"` + "`" + `\nStatus   int    ` + "`" + `json:\"status,omitempty\"` + "`" + `   // http status",
+                    "type": "string"
                 }
             }
         }

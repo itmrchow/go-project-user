@@ -12,7 +12,11 @@ import (
 
 func addUserRoutes(rg *gin.RouterGroup) {
 
-	userController, _ := config.InitUserController()
+	userController, err := config.InitUserController()
+
+	if err != nil {
+		panic(err)
+	}
 
 	// user API
 	rg.GET("/user/:userId", func(c *gin.Context) {
@@ -118,10 +122,18 @@ func createUser(c *gin.Context, controller *controllers.UserController) {
 
 	// context to dto
 	userReq := new(reqdto.CreateUserReq) // bind bto
-	c.BindJSON(&userReq)
+
+	if err := c.BindJSON(&userReq); err != nil {
+		c.Error(err)
+		return
+	}
 
 	// call controller
-	response := controller.CreateUser(userReq)
+	response, err := controller.CreateUser(userReq)
+	if err != nil {
+		c.Error(err)
+		return
+	}
 
 	c.JSON(http.StatusOK, response)
 }

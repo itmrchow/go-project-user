@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 
 	"itmrchow/go-project/user/src/domain"
 	"itmrchow/go-project/user/src/usecase/handler"
@@ -38,21 +39,23 @@ func NewCreateUserUseCase(userRepo repo.UserRepo, encryptionHandler handler.Encr
 }
 
 func (c CreateUserUseCase) CreateUser(input CreateUserInput) (*CreateUserOutput, error) {
+
 	// 1. 欄位資料庫檢查 - 是否存在
-	isExists, existsErr := c.userRepo.ExistsByAccountOrEmailOrPhone(input.Account, input.Email, input.Phone)
-	if existsErr != nil {
-		return nil, existsErr
+	isExists, err := c.userRepo.ExistsByAccountOrEmailOrPhone(input.Account, input.Email, input.Phone)
+	if err != nil {
+
+		return nil, errors.Join(ErrDbFail, err)
 	} else if isExists {
-		return nil, errors.New("user exists")
+		return nil, ErrUserAlreadyExists
 	}
 
 	// 2. 產生UUID
 	uuidStr := uuid.New().String()
 
 	// 3. hash password
-	hashStr, hashErr := c.encryptionHandler.HashPassword(input.Password)
-	if hashErr != nil {
-		return nil, hashErr
+	hashStr, err := c.encryptionHandler.HashPassword(input.Password)
+	if err != nil {
+		return nil, errors.Join(ErrPasswordHash, err)
 	}
 
 	// 4. 寫入資料庫
@@ -73,8 +76,10 @@ func (c CreateUserUseCase) CreateUser(input CreateUserInput) (*CreateUserOutput,
 			Email:    userModel.Email,
 			Phone:    userModel.Phone,
 		}, nil
+	} else if errors.Is(err, gorm.ErrDuplicatedKey) {
+		return nil, errors.Join(ErrDbInsertFail, err)
 	} else {
-		return nil, err
+		return nil, errors.Join(ErrDbFail, err)
 	}
 
 }

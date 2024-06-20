@@ -27,7 +27,7 @@ func NewUserController(handler *database.MysqlHandler) *UserController {
 	}
 }
 
-func (controller *UserController) CreateUser(createUserReq *reqdto.CreateUserReq) *respdto.CreateUserResp {
+func (controller *UserController) CreateUser(createUserReq *reqdto.CreateUserReq) (*respdto.CreateUserResp, error) {
 
 	input := new(usecase.CreateUserInput)
 	input.Account = createUserReq.Account
@@ -36,7 +36,11 @@ func (controller *UserController) CreateUser(createUserReq *reqdto.CreateUserReq
 	input.Password = createUserReq.Password
 	input.UserName = createUserReq.UserName
 
-	out, _ := controller.createUserUC.CreateUser(*input)
+	out, err := controller.createUserUC.CreateUser(*input)
+
+	if err != nil {
+		return nil, err
+	}
 
 	return &respdto.CreateUserResp{
 		Id:       out.Id,
@@ -44,7 +48,7 @@ func (controller *UserController) CreateUser(createUserReq *reqdto.CreateUserReq
 		Account:  out.Account,
 		Email:    out.Email,
 		Phone:    out.Phone,
-	}
+	}, err
 }
 
 func (controller *UserController) GetUser(userId string) (*respdto.GetUserResp, error) {

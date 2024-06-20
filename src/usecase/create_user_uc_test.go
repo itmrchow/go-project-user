@@ -56,11 +56,11 @@ func (s *CreateUserUCTestSuite) Test_CreateUser_UserExists() {
 			},
 		},
 		mockFunc: func(repoMock *repo.UserRepoMock) {
-			repoMock.On(ExistFuncStr, mock.Anything, mock.Anything, mock.Anything).Return(false, errors.New("some error"))
+			repoMock.On(ExistFuncStr, mock.Anything, mock.Anything, mock.Anything).Return(false, ErrUserAlreadyExists)
 		},
 		assertFunc: func(got *CreateUserOutput, err error) {
 			s.Assert().Nil(got)
-			s.Assert().EqualError(err, errors.New("some error").Error())
+			s.Assert().ErrorIs(err, ErrUserAlreadyExists)
 
 			s.repoMock.AssertNotCalled(s.T(), "Create")
 		},

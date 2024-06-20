@@ -85,7 +85,7 @@ func (s *GetUserUCTestSuite) Test_GetUser_QueryError() {
 	got, err := s.usecase.GetUser(testcase.args.userId)
 
 	s.Assert().Nil(got)
-	s.Assert().EqualError(err, testcase.wantErr.Error())
+	s.Assert().ErrorIs(err, ErrDbFail)
 }
 
 func (s *GetUserUCTestSuite) Test_GetUser_HasUser() {

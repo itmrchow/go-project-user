@@ -40,6 +40,6 @@ func (c GetUserUseCase) GetUser(userId string) (*GetUserOutput, error) {
 	} else if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil
 	} else {
-		return nil, err
+		return nil, errors.Join(ErrDbFail, err)
 	}
 }

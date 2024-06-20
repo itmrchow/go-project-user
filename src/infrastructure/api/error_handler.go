@@ -45,18 +45,22 @@ func setErrResp(err error) (status int, errResp respdto.ApiErrorResp) {
 		status = http.StatusBadRequest
 		errResp.Title = "Bind Error"
 		errResp.Detail = err.Error()
+
 	case errors.Is(err, usecase.ErrDbFail):
 		status = http.StatusInternalServerError
 		errResp.Title = "Internal Error"
-		errResp.Detail = err.Error()
+		errResp.Detail = usecase.ErrDbFail.Error()
+
 	case errors.Is(err, usecase.ErrDbInsertFail):
 		status = http.StatusConflict
 		errResp.Title = "Conflict Error"
 		errResp.Detail = err.Error()
+
 	case errors.Is(err, usecase.ErrPasswordHash):
 		status = http.StatusConflict
 		errResp.Title = "Bad Request"
 		errResp.Detail = err.Error()
+
 	default:
 		status = http.StatusInternalServerError
 		errResp.Title = "Other Error"

@@ -47,9 +47,7 @@ func InitPingController() (*controllers.PingController, error) {
 
 var dbSet = wire.NewSet(database.NewMySqlHandler)
 
-var repoSet = wire.NewSet(repo_impl.NewUserRepoImpl, wire.Bind(new(repo.UserRepo), new(repo_impl.UserRepoImpl)))
-
-var controllerSet = wire.NewSet(controllers.NewUserController)
+var repoSet = wire.NewSet(repo_impl.NewUserRepoImpl, wire.Bind(new(repo.UserRepo), new(*repo_impl.UserRepoImpl)))
 
 var handlerSet = wire.NewSet(handlerimpl.NewBcryptHandler, wire.Bind(new(handler.EncryptionHandler), new(*handlerimpl.BcryptHandler)))
 

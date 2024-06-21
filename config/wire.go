@@ -22,24 +22,17 @@ var dbSet = wire.NewSet(
 )
 
 var repoSet = wire.NewSet(
-	repo_impl.NewUserRepoImpl,
-	wire.Bind(new(repo.UserRepo), new(repo_impl.UserRepoImpl)),
-)
-
-var controllerSet = wire.NewSet(
-	controllers.NewUserController,
+	repo_impl.NewUserRepoImpl, wire.Bind(new(repo.UserRepo), new(*repo_impl.UserRepoImpl)),
 )
 
 var handlerSet = wire.NewSet(
-	handlerimpl.NewBcryptHandler,
-	wire.Bind(new(handler.EncryptionHandler), new(*handlerimpl.BcryptHandler)),
+	handlerimpl.NewBcryptHandler, wire.Bind(new(handler.EncryptionHandler), new(*handlerimpl.BcryptHandler)),
 )
 
 var usecaseSet = wire.NewSet(
 	usecase.NewCreateUserUseCase,
 	usecase.NewGetUserUseCase,
-	usecase.NewPingServiceImpl,
-	wire.Bind(new(usecase.PingService), new(*usecase.PingServiceImpl)),
+	usecase.NewPingServiceImpl, wire.Bind(new(usecase.PingService), new(*usecase.PingServiceImpl)),
 )
 
 func InitUserController() (*controllers.UserController, error) {

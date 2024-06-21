@@ -11,6 +11,7 @@ import (
 	"itmrchow/go-project/user/src/infrastructure/database"
 	"itmrchow/go-project/user/src/interfaces/api/controllers"
 	"itmrchow/go-project/user/src/interfaces/repo_impl"
+	"itmrchow/go-project/user/src/usecase"
 	"itmrchow/go-project/user/src/usecase/repo"
 )
 
@@ -27,10 +28,24 @@ var controllerSet = wire.NewSet(
 	controllers.NewUserController,
 )
 
+var handlerSet = wire.NewSet()
+
 var usecaseSet = wire.NewSet()
 
 func InitUserController() (*controllers.UserController, error) {
-	wire.Build(dbSet, controllers.NewUserController)
+	wire.Build(dbSet, repoSet, controllers.NewUserController)
 
 	return &controllers.UserController{}, nil
+}
+
+var ucSet = wire.NewSet(
+	usecase.NewPingServiceImpl,
+	wire.Bind(new(usecase.PingService), new(*usecase.PingServiceImpl)),
+)
+
+func InitPingController() (*controllers.PingController, error) {
+
+	wire.Build(dbSet, repoSet, ucSet, controllers.NewPingController)
+
+	return &controllers.PingController{}, nil
 }

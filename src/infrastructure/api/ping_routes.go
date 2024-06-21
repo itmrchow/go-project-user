@@ -5,12 +5,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"itmrchow/go-project/user/config"
 	"itmrchow/go-project/user/src/infrastructure/api/respdto"
 	"itmrchow/go-project/user/src/interfaces/api/controllers"
 )
 
 func addExampleRoutes(rg *gin.RouterGroup) {
-	controller := controllers.NewPingController()
+	controller, _ := config.InitPingController()
 
 	rg.GET("/ping", func(c *gin.Context) {
 		getPingHandler(c, controller)

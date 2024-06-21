@@ -5,8 +5,8 @@ import (
 	"itmrchow/go-project/user/src/infrastructure/api/respdto"
 	"itmrchow/go-project/user/src/infrastructure/database"
 	"itmrchow/go-project/user/src/interfaces/handlerimpl"
-	"itmrchow/go-project/user/src/interfaces/repo_impl"
 	"itmrchow/go-project/user/src/usecase"
+	"itmrchow/go-project/user/src/usecase/repo"
 )
 
 type UserController struct {
@@ -14,9 +14,12 @@ type UserController struct {
 	getUserUC    *usecase.GetUserUseCase
 }
 
-func NewUserController(handler *database.MysqlHandler) *UserController {
+func NewUserController(
+	handler *database.MysqlHandler,
+	userRepo repo.UserRepo,
 
-	userRepo := repo_impl.NewUserRepoImpl(handler)
+) *UserController {
+
 	encryptionHandler := new(handlerimpl.BcryptHandler)
 	createUserUC := usecase.NewCreateUserUseCase(userRepo, encryptionHandler)
 	getUserUC := usecase.NewGetUserUseCase(userRepo)

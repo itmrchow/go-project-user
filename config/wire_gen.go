@@ -11,6 +11,7 @@ import (
 	"itmrchow/go-project/user/src/infrastructure/database"
 	"itmrchow/go-project/user/src/interfaces/api/controllers"
 	"itmrchow/go-project/user/src/interfaces/repo_impl"
+	"itmrchow/go-project/user/src/usecase"
 	"itmrchow/go-project/user/src/usecase/repo"
 )
 
@@ -21,8 +22,20 @@ func InitUserController() (*controllers.UserController, error) {
 	if err != nil {
 		return nil, err
 	}
-	userController := controllers.NewUserController(mysqlHandler)
+	userRepoImpl := repo_impl.NewUserRepoImpl(mysqlHandler)
+	userController := controllers.NewUserController(mysqlHandler, userRepoImpl)
 	return userController, nil
+}
+
+func InitPingController() (*controllers.PingController, error) {
+	mysqlHandler, err := database.NewMySqlHandler()
+	if err != nil {
+		return nil, err
+	}
+	userRepoImpl := repo_impl.NewUserRepoImpl(mysqlHandler)
+	pingServiceImpl := usecase.NewPingServiceImpl(userRepoImpl)
+	pingController := controllers.NewPingController(pingServiceImpl)
+	return pingController, nil
 }
 
 // wire.go:
@@ -33,4 +46,8 @@ var repoSet = wire.NewSet(repo_impl.NewUserRepoImpl, wire.Bind(new(repo.UserRepo
 
 var controllerSet = wire.NewSet(controllers.NewUserController)
 
+var handlerSet = wire.NewSet()
+
 var usecaseSet = wire.NewSet()
+
+var ucSet = wire.NewSet(usecase.NewPingServiceImpl, wire.Bind(new(usecase.PingService), new(*usecase.PingServiceImpl)))

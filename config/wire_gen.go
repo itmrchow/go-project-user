@@ -10,8 +10,10 @@ import (
 	"github.com/google/wire"
 	"itmrchow/go-project/user/src/infrastructure/database"
 	"itmrchow/go-project/user/src/interfaces/api/controllers"
+	"itmrchow/go-project/user/src/interfaces/handlerimpl"
 	"itmrchow/go-project/user/src/interfaces/repo_impl"
 	"itmrchow/go-project/user/src/usecase"
+	"itmrchow/go-project/user/src/usecase/handler"
 	"itmrchow/go-project/user/src/usecase/repo"
 )
 
@@ -23,7 +25,10 @@ func InitUserController() (*controllers.UserController, error) {
 		return nil, err
 	}
 	userRepoImpl := repo_impl.NewUserRepoImpl(mysqlHandler)
-	userController := controllers.NewUserController(mysqlHandler, userRepoImpl)
+	bcryptHandler := handlerimpl.NewBcryptHandler()
+	createUserUseCase := usecase.NewCreateUserUseCase(userRepoImpl, bcryptHandler)
+	getUserUseCase := usecase.NewGetUserUseCase(userRepoImpl)
+	userController := controllers.NewUserController(createUserUseCase, getUserUseCase)
 	return userController, nil
 }
 
@@ -46,8 +51,6 @@ var repoSet = wire.NewSet(repo_impl.NewUserRepoImpl, wire.Bind(new(repo.UserRepo
 
 var controllerSet = wire.NewSet(controllers.NewUserController)
 
-var handlerSet = wire.NewSet()
+var handlerSet = wire.NewSet(handlerimpl.NewBcryptHandler, wire.Bind(new(handler.EncryptionHandler), new(*handlerimpl.BcryptHandler)))
 
-var usecaseSet = wire.NewSet()
-
-var ucSet = wire.NewSet(usecase.NewPingServiceImpl, wire.Bind(new(usecase.PingService), new(*usecase.PingServiceImpl)))
+var usecaseSet = wire.NewSet(usecase.NewCreateUserUseCase, usecase.NewGetUserUseCase, usecase.NewPingServiceImpl, wire.Bind(new(usecase.PingService), new(*usecase.PingServiceImpl)))

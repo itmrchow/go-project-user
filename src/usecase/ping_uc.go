@@ -19,7 +19,7 @@ func NewPingServiceImpl(userRepo repo.UserRepo) *PingServiceImpl {
 }
 
 func (p *PingServiceImpl) Ping() (string, error) {
-	_, err := p.userRepo.Get("for-chec")
+	_, err := p.userRepo.Get("for-check")
 
 	if err != nil {
 		return "error", errors.Join(ErrDbFail, err)

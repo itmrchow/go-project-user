@@ -3,10 +3,7 @@ package controllers
 import (
 	"itmrchow/go-project/user/src/infrastructure/api/reqdto"
 	"itmrchow/go-project/user/src/infrastructure/api/respdto"
-	"itmrchow/go-project/user/src/infrastructure/database"
-	"itmrchow/go-project/user/src/interfaces/handlerimpl"
 	"itmrchow/go-project/user/src/usecase"
-	"itmrchow/go-project/user/src/usecase/repo"
 )
 
 type UserController struct {
@@ -15,18 +12,12 @@ type UserController struct {
 }
 
 func NewUserController(
-	handler *database.MysqlHandler,
-	userRepo repo.UserRepo,
-
+	createUserUc *usecase.CreateUserUseCase,
+	getUserUc *usecase.GetUserUseCase,
 ) *UserController {
-
-	encryptionHandler := new(handlerimpl.BcryptHandler)
-	createUserUC := usecase.NewCreateUserUseCase(userRepo, encryptionHandler)
-	getUserUC := usecase.NewGetUserUseCase(userRepo)
-
 	return &UserController{
-		createUserUC: createUserUC,
-		getUserUC:    getUserUC,
+		createUserUC: createUserUc,
+		getUserUC:    getUserUc,
 	}
 }
 

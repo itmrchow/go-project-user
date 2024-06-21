@@ -5,6 +5,10 @@ import "golang.org/x/crypto/bcrypt"
 type BcryptHandler struct {
 }
 
+func NewBcryptHandler() *BcryptHandler {
+	return &BcryptHandler{}
+}
+
 func (b *BcryptHandler) HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	return string(bytes), err

@@ -61,3 +61,7 @@ func (controller *UserController) GetUser(userId string) (*respdto.GetUserResp, 
 		Phone:    out.Phone,
 	}, nil
 }
+
+func (controller *UserController) Login(loginReq *reqdto.LoginReq) error {
+	return nil
+}

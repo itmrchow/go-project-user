@@ -38,7 +38,9 @@ func addUserRoutes(rg *gin.RouterGroup) {
 		deleteUser(c, userController)
 	})
 
-	rg.POST("/login", loginUser)
+	rg.POST("/login", func(c *gin.Context) {
+		loginUser(c, userController)
+	})
 }
 
 // @Summary 刪除用戶 by Id
@@ -142,21 +144,22 @@ func createUser(c *gin.Context, controller *controllers.UserController) {
 // @Produce json
 // @Tags User
 // @Success 200 {string} string "ok" "返回用户信息"
-// @Failure 400 {string} string "err_code：10002 参数错误； err_code：10003 校验错误"
-// @Failure 401 {string} string "err_code：10001 登录失败"
+// @Param body body reqdto.LoginReq true "Login sample , account 和 email 需擇一輸入"
+// @response default {object} respdto.ApiErrorResp "error response"
 // @Router /login [post]
-func loginUser(c *gin.Context) {
+func loginUser(c *gin.Context, controller *controllers.UserController) {
+	// bind req
 	loginReq := new(reqdto.LoginReq)
-	// check account
-	isAuth := AuthUser(loginReq.Account, loginReq.Password)
 
-	if isAuth {
-		c.JSON(http.StatusOK, gin.H{"token": "token"})
-	} else {
-		c.JSON(http.StatusUnauthorized, gin.H{"msg": "account or password is wrong"})
+	if err := c.BindJSON(&loginReq); err != nil {
+		c.Error(err)
+		return
 	}
-}
 
-func AuthUser(account string, password string) bool {
-	return true
+	if err := controller.Login(loginReq); err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"token": "token"})
 }

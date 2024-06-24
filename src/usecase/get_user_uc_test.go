@@ -127,3 +127,51 @@ func (s *GetUserUCTestSuite) Test_GetUser_HasUser() {
 	s.Assert().EqualValues(got, testcase.want)
 	s.Assert().Nil(err)
 }
+
+// Login_Test
+
+func (s *GetUserUCTestSuite) Test_Login_NoUser() {
+	type test struct {
+		name     string
+		args     LoginInput
+		mockFunc func(repoMock *repo.UserRepoMock)
+		want     string
+		wantErr  error
+	}
+
+	testcase := &test{
+		name: "no_user",
+		args: LoginInput{
+			Account:  "Account",
+			Email:    "Email",
+			Password: "XXXXXXXX",
+		},
+		mockFunc: func(repoMock *repo.UserRepoMock) {
+			repoMock.On("GetByAccountOrEmail", mock.Anything, mock.Anything).Return(nil, gorm.ErrRecordNotFound)
+		},
+		want:    "",
+		wantErr: ErrUserNotExists,
+	}
+
+	s.Run(testcase.name, func() {
+
+		// mock
+		testcase.mockFunc(s.repoMock)
+
+		// run
+		gotToken, err := s.usecase.Login(testcase.args)
+
+		// assert
+		s.Assert().Equal("", gotToken)
+		s.Assert().ErrorIs(err, ErrUserNotExists)
+
+	})
+}
+
+func (s *GetUserUCTestSuite) Test_Login_InvalidPsw() {
+
+}
+
+// func (s *GetUserUCTestSuite) Test_Login_JWTError() {}
+
+// func (s *GetUserUCTestSuite) Test_Login_Success() {}

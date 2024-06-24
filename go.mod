@@ -4,6 +4,8 @@ go 1.21.4
 
 require github.com/go-playground/validator v9.31.0+incompatible
 
+require github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
+
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/BurntSushi/toml v1.4.0 // indirect

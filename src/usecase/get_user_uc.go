@@ -8,6 +8,12 @@ import (
 	"itmrchow/go-project/user/src/usecase/repo"
 )
 
+type LoginInput struct {
+	Account  string
+	Email    string
+	Password string
+}
+
 // 定義output
 type GetUserOutput struct {
 	Id       string `json:"id"`
@@ -42,4 +48,19 @@ func (c GetUserUseCase) GetUser(userId string) (*GetUserOutput, error) {
 	} else {
 		return nil, errors.Join(ErrDbFail, err)
 	}
+}
+
+func (c GetUserUseCase) Login(loginInput LoginInput) (string, error) {
+	// query user
+	_, err := c.userRepo.GetByAccountOrEmail(loginInput.Account, loginInput.Email)
+	if err != nil {
+		return "", errors.Join(ErrUserNotExists, err)
+	}
+
+	// check password
+	// psw := user.Password
+
+	// create token & return
+
+	return "", nil
 }

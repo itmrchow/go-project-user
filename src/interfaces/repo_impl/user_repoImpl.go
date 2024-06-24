@@ -37,3 +37,10 @@ func (u *UserRepoImpl) ExistsByAccountOrEmailOrPhone(account string, email strin
 		return count > 0, nil
 	}
 }
+
+func (u *UserRepoImpl) GetByAccountOrEmail(account string, email string) (*domain.User, error) {
+	var user = domain.User{Account: account, Email: email}
+	result := u.handler.DB.First(&user)
+
+	return &user, result.Error
+}

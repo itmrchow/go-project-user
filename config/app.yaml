@@ -15,3 +15,5 @@ mysql:
   password: "xxxx"
   name: "Project"
   isShowLog: false
+
+privatekey: "xxxx"

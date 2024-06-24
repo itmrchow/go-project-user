@@ -143,7 +143,7 @@ func (s *GetUserUCTestSuite) Test_Login_NoUser() {
 	}
 
 	testcase := &test{
-		name: "no_user",
+		name: "NoUser",
 		args: LoginInput{
 			Account:  "Account",
 			Email:    "Email",
@@ -181,7 +181,7 @@ func (s *GetUserUCTestSuite) Test_Login_InvalidPsw() {
 	}
 
 	testcase := &test{
-		name: "no_user",
+		name: "InvalidPsw",
 		args: LoginInput{
 			Account:  "Account",
 			Email:    "Email",
@@ -219,6 +219,49 @@ func (s *GetUserUCTestSuite) Test_Login_InvalidPsw() {
 	})
 }
 
-// func (s *GetUserUCTestSuite) Test_Login_JWTError() {}
+func (s *GetUserUCTestSuite) Test_Login_Success() {
+	type test struct {
+		name     string
+		args     LoginInput
+		mockFunc func(repoMock *repo.UserRepoMock, encrypMock *handler.EncryptionHandlerMock)
+		want     string
+		wantErr  error
+	}
 
-// func (s *GetUserUCTestSuite) Test_Login_Success() {}
+	testcase := &test{
+		name: "JWTError",
+		args: LoginInput{
+			Account:  "Account",
+			Email:    "Email",
+			Password: "XXXXXXXX",
+		},
+		mockFunc: func(repoMock *repo.UserRepoMock, encrypMock *handler.EncryptionHandlerMock) {
+			repoMock.On("GetByAccountOrEmail", mock.Anything, mock.Anything).Return(
+				&domain.User{
+					Id:       "id",
+					UserName: "UserName",
+					Account:  "Account",
+					Password: "12345678",
+					Email:    "Email",
+					Phone:    "Phone",
+				}, nil)
+
+			encrypMock.On("CheckPasswordHash", mock.Anything, mock.Anything).Return(true)
+		},
+		want:    "",
+		wantErr: ErrUnauthorized,
+	}
+
+	s.Run(testcase.name, func() {
+
+		// mock
+		testcase.mockFunc(s.repoMock, s.encryptionHandlerMock)
+
+		// run
+		gotToken, err := s.usecase.Login(testcase.args)
+
+		// assert
+		s.Assert().NotNil(gotToken)
+		s.Assert().Nil(err)
+	})
+}

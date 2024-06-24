@@ -2,7 +2,10 @@ package usecase
 
 import (
 	"errors"
+	"time"
 
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
 
 	"itmrchow/go-project/user/src/usecase/handler"
@@ -71,6 +74,19 @@ func (c GetUserUseCase) Login(loginInput LoginInput) (string, error) {
 	}
 
 	// create token & return
+	key := []byte(viper.GetString("privatekey")) // get from env
 
-	return "", nil
+	t := jwt.NewWithClaims(
+		jwt.SigningMethodHS256,
+		jwt.MapClaims{
+			"exp":      time.Now().Add(time.Hour).Unix(),
+			"id":       user.Id,
+			"userName": user.UserName,
+			"account":  user.Account,
+			"email":    user.Email,
+			"phone":    user.Phone,
+		})
+	s, err := t.SignedString(key)
+
+	return s, err
 }

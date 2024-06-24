@@ -52,9 +52,9 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok\" \"返回用户信息",
+                        "description": "返回token訊息",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/respdto.LoginResp"
                         }
                     },
                     "default": {
@@ -483,6 +483,19 @@
                 "title": {
                     "description": "Type     string `json:\"type,omitempty\"`\nStatus   int    `json:\"status,omitempty\"`   // http status",
                     "type": "string"
+                }
+            }
+        },
+        "respdto.LoginResp": {
+            "type": "object",
+            "properties": {
+                "exp": {
+                    "type": "integer",
+                    "example": 1719218836
+                },
+                "token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50IjoiamVmZjc3NzciLCJlbWFpbCI6ImplZmZAZ21haWwuY29tIiwiZXhwIjoxNzE5MjE4ODM2LCJpZCI6ImZhNzkxODE2LWRkMzUtNDJlNi1hNDc1LTAwZjg3ZDRhYzlhYSIsInBob25lIjoiKzg4Njk1NTU1NTU1NSIsInVzZXJOYW1lIjoiSmVmZiJ9.ALccbWnDW4Tg6NvIS8aCw3B96okQ3gLVqiEz3Ukq_eA"
                 }
             }
         }

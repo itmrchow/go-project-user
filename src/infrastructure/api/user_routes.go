@@ -143,8 +143,8 @@ func createUser(c *gin.Context, controller *controllers.UserController) {
 // @Summary 登入
 // @Produce json
 // @Tags User
-// @Success 200 {string} string "ok" "返回用户信息"
 // @Param body body reqdto.LoginReq true "Login sample , account 和 email 需擇一輸入"
+// @Success 200 {object} respdto.LoginResp "返回token訊息"
 // @response default {object} respdto.ApiErrorResp "error response"
 // @Router /login [post]
 func loginUser(c *gin.Context, controller *controllers.UserController) {
@@ -156,10 +156,12 @@ func loginUser(c *gin.Context, controller *controllers.UserController) {
 		return
 	}
 
-	if err := controller.Login(loginReq); err != nil {
+	resp, err := controller.Login(loginReq)
+
+	if err != nil {
 		c.Error(err)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": "token"})
+	c.JSON(http.StatusOK, resp)
 }

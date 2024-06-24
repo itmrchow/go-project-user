@@ -18,15 +18,6 @@ type LoginInput struct {
 	Password string
 }
 
-// 定義output
-type GetUserOutput struct {
-	Id       string `json:"id"`
-	UserName string `json:"userName"`
-	Account  string `json:"account"`
-	Email    string `json:"email"`
-	Phone    string `json:"phone"`
-}
-
 type GetUserUseCase struct {
 	userRepo          repo.UserRepo
 	encryptionHandler handler.EncryptionHandler
@@ -37,6 +28,15 @@ func NewGetUserUseCase(userRepo repo.UserRepo, encryptionHandler handler.Encrypt
 		userRepo:          userRepo,
 		encryptionHandler: encryptionHandler,
 	}
+}
+
+// 定義output
+type GetUserOutput struct {
+	Id       string `json:"id"`
+	UserName string `json:"userName"`
+	Account  string `json:"account"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
 }
 
 func (c GetUserUseCase) GetUser(userId string) (*GetUserOutput, error) {
@@ -58,11 +58,17 @@ func (c GetUserUseCase) GetUser(userId string) (*GetUserOutput, error) {
 	}
 }
 
-func (c GetUserUseCase) Login(loginInput LoginInput) (string, error) {
+// 定義output
+type LoginOutput struct {
+	Token string `json:"token"`
+	Exp   int64  `json:"exp"`
+}
+
+func (c GetUserUseCase) Login(loginInput LoginInput) (LoginOutput, error) {
 	// query user
 	user, err := c.userRepo.GetByAccountOrEmail(loginInput.Account, loginInput.Email)
 	if err != nil {
-		return "", errors.Join(ErrUserNotExists, err)
+		return LoginOutput{}, errors.Join(ErrUserNotExists, err)
 	}
 
 	// check password
@@ -70,23 +76,28 @@ func (c GetUserUseCase) Login(loginInput LoginInput) (string, error) {
 	isCorrectPsw := c.encryptionHandler.CheckPasswordHash(loginInput.Password, psw)
 
 	if !isCorrectPsw {
-		return "", ErrUnauthorized
+		return LoginOutput{}, ErrUnauthorized
 	}
 
 	// create token & return
-	key := []byte(viper.GetString("privatekey")) // get from env
+	key := []byte(viper.GetString("privatekey"))
+
+	exp := time.Now().Add(time.Hour).Unix()
 
 	t := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		jwt.MapClaims{
-			"exp":      time.Now().Add(time.Hour).Unix(),
+			"exp":      exp,
 			"id":       user.Id,
 			"userName": user.UserName,
 			"account":  user.Account,
 			"email":    user.Email,
 			"phone":    user.Phone,
 		})
-	s, err := t.SignedString(key)
+	token, err := t.SignedString(key)
 
-	return s, err
+	return LoginOutput{
+		Token: token,
+		Exp:   exp,
+	}, err
 }

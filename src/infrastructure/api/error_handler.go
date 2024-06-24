@@ -56,9 +56,14 @@ func setErrResp(err error) (status int, errResp respdto.ApiErrorResp) {
 		errResp.Title = "Conflict Error"
 		errResp.Detail = err.Error()
 
-	case errors.Is(err, usecase.ErrPasswordHash):
-		status = http.StatusConflict
-		errResp.Title = "Bad Request"
+	case errors.Is(err, usecase.ErrUserNotExists):
+		status = http.StatusNotFound
+		errResp.Title = "Not Found"
+		errResp.Detail = err.Error()
+
+	case errors.Is(err, usecase.ErrUnauthorized):
+		status = http.StatusUnauthorized
+		errResp.Title = "Unauthorized"
 		errResp.Detail = err.Error()
 
 	default:

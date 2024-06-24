@@ -62,6 +62,18 @@ func (controller *UserController) GetUser(userId string) (*respdto.GetUserResp, 
 	}, nil
 }
 
-func (controller *UserController) Login(loginReq *reqdto.LoginReq) error {
-	return nil
+func (controller *UserController) Login(loginReq *reqdto.LoginReq) (*respdto.LoginResp, error) {
+
+	input := usecase.LoginInput{
+		Account:  loginReq.Account,
+		Email:    loginReq.Email,
+		Password: loginReq.Password,
+	}
+
+	out, err := controller.getUserUC.Login(input)
+
+	return &respdto.LoginResp{
+		Token: out.Token,
+		Exp:   out.Exp,
+	}, err
 }

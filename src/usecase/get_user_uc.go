@@ -5,6 +5,7 @@ import (
 
 	"gorm.io/gorm"
 
+	"itmrchow/go-project/user/src/usecase/handler"
 	"itmrchow/go-project/user/src/usecase/repo"
 )
 
@@ -24,11 +25,15 @@ type GetUserOutput struct {
 }
 
 type GetUserUseCase struct {
-	userRepo repo.UserRepo
+	userRepo          repo.UserRepo
+	encryptionHandler handler.EncryptionHandler
 }
 
-func NewGetUserUseCase(userRepo repo.UserRepo) *GetUserUseCase {
-	return &GetUserUseCase{userRepo: userRepo}
+func NewGetUserUseCase(userRepo repo.UserRepo, encryptionHandler handler.EncryptionHandler) *GetUserUseCase {
+	return &GetUserUseCase{
+		userRepo:          userRepo,
+		encryptionHandler: encryptionHandler,
+	}
 }
 
 func (c GetUserUseCase) GetUser(userId string) (*GetUserOutput, error) {
@@ -52,13 +57,18 @@ func (c GetUserUseCase) GetUser(userId string) (*GetUserOutput, error) {
 
 func (c GetUserUseCase) Login(loginInput LoginInput) (string, error) {
 	// query user
-	_, err := c.userRepo.GetByAccountOrEmail(loginInput.Account, loginInput.Email)
+	user, err := c.userRepo.GetByAccountOrEmail(loginInput.Account, loginInput.Email)
 	if err != nil {
 		return "", errors.Join(ErrUserNotExists, err)
 	}
 
 	// check password
-	// psw := user.Password
+	psw := user.Password
+	isCorrectPsw := c.encryptionHandler.CheckPasswordHash(loginInput.Password, psw)
+
+	if !isCorrectPsw {
+		return "", ErrUnauthorized
+	}
 
 	// create token & return
 

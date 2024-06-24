@@ -11,6 +11,8 @@ var (
 
 	ErrUserNotExists = errors.New("user not exists")
 
+	ErrUnauthorized = errors.New("unauthorized")
+
 	ErrDbFail = errors.New("db fail")
 
 	ErrDbInsertFail = errors.New("db fail, insert key exist")

@@ -27,7 +27,7 @@ func InitUserController() (*controllers.UserController, error) {
 	userRepoImpl := repo_impl.NewUserRepoImpl(mysqlHandler)
 	bcryptHandler := handlerimpl.NewBcryptHandler()
 	createUserUseCase := usecase.NewCreateUserUseCase(userRepoImpl, bcryptHandler)
-	getUserUseCase := usecase.NewGetUserUseCase(userRepoImpl)
+	getUserUseCase := usecase.NewGetUserUseCase(userRepoImpl, bcryptHandler)
 	userController := controllers.NewUserController(createUserUseCase, getUserUseCase)
 	return userController, nil
 }

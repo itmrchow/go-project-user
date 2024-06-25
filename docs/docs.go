@@ -125,21 +125,15 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok\" \"返回用户信息",
+                        "description": "返回創建用戶訊息",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/respdto.CreateUserResp"
                         }
                     },
-                    "400": {
-                        "description": "err_code：10002 参数错误； err_code：10003 校验错误",
+                    "default": {
+                        "description": "error response",
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "401": {
-                        "description": "err_code：10001 登录失败",
-                        "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/respdto.ApiErrorResp"
                         }
                     }
                 }
@@ -490,6 +484,26 @@ const docTemplate = `{
                 },
                 "title": {
                     "description": "Type     string ` + "`" + `json:\"type,omitempty\"` + "`" + `\nStatus   int    ` + "`" + `json:\"status,omitempty\"` + "`" + `   // http status",
+                    "type": "string"
+                }
+            }
+        },
+        "respdto.CreateUserResp": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "userName": {
                     "type": "string"
                 }
             }

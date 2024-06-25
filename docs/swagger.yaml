@@ -93,6 +93,19 @@ definitions:
           Status   int    `json:"status,omitempty"`   // http status
         type: string
     type: object
+  respdto.CreateUserResp:
+    properties:
+      account:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      phone:
+        type: string
+      userName:
+        type: string
+    type: object
   respdto.LoginResp:
     properties:
       exp:
@@ -178,17 +191,13 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok" "返回用户信息
+          description: 返回創建用戶訊息
           schema:
-            type: string
-        "400":
-          description: err_code：10002 参数错误； err_code：10003 校验错误
+            $ref: '#/definitions/respdto.CreateUserResp'
+        default:
+          description: error response
           schema:
-            type: string
-        "401":
-          description: err_code：10001 登录失败
-          schema:
-            type: string
+            $ref: '#/definitions/respdto.ApiErrorResp'
       summary: 建立用戶
       tags:
       - User

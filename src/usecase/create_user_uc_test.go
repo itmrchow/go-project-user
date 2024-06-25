@@ -9,6 +9,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"itmrchow/go-project/user/src/domain"
+	"itmrchow/go-project/user/src/infrastructure/api/reqdto"
 	"itmrchow/go-project/user/src/interfaces/handlerimpl"
 	"itmrchow/go-project/user/src/usecase/handler"
 	"itmrchow/go-project/user/src/usecase/repo"
@@ -37,7 +38,8 @@ func (s *CreateUserUCTestSuite) SetupTest() {
 
 func (s *CreateUserUCTestSuite) Test_CreateUser_UserExists() {
 	type args struct {
-		input CreateUserInput
+		input    CreateUserInput
+		authUser reqdto.AuthUser
 	}
 	type test struct {
 		name       string
@@ -54,6 +56,9 @@ func (s *CreateUserUCTestSuite) Test_CreateUser_UserExists() {
 				Email:   "XXXXXXXXXXXXX",
 				Phone:   "1234567890",
 			},
+			authUser: reqdto.AuthUser{
+				Id: "create_id",
+			},
 		},
 		mockFunc: func(repoMock *repo.UserRepoMock) {
 			repoMock.On(ExistFuncStr, mock.Anything, mock.Anything, mock.Anything).Return(false, ErrUserAlreadyExists)
@@ -68,14 +73,15 @@ func (s *CreateUserUCTestSuite) Test_CreateUser_UserExists() {
 
 	s.Run(testcase.name, func() {
 		testcase.mockFunc(s.repoMock)
-		got, err := s.usecase.CreateUser(testcase.args.input)
+		got, err := s.usecase.CreateUser(testcase.args.input, testcase.args.authUser)
 		testcase.assertFunc(got, err)
 	})
 }
 
 func (s *CreateUserUCTestSuite) Test_CreateUser_QueryUserError() {
 	type args struct {
-		input CreateUserInput
+		input    CreateUserInput
+		authUser reqdto.AuthUser
 	}
 	type test struct {
 		name       string
@@ -108,14 +114,15 @@ func (s *CreateUserUCTestSuite) Test_CreateUser_QueryUserError() {
 
 	s.Run(testcase.name, func() {
 		testcase.mockFunc(s.repoMock)
-		got, err := s.usecase.CreateUser(testcase.args.input)
+		got, err := s.usecase.CreateUser(testcase.args.input, testcase.args.authUser)
 		testcase.assertFunc(got, err)
 	})
 }
 
 func (s *CreateUserUCTestSuite) Test_CreateUser_HashPasswordError() {
 	type args struct {
-		input CreateUserInput
+		input    CreateUserInput
+		authUser reqdto.AuthUser
 	}
 	type test struct {
 		name       string
@@ -148,14 +155,15 @@ func (s *CreateUserUCTestSuite) Test_CreateUser_HashPasswordError() {
 
 	s.Run(testcase.name, func() {
 		testcase.mockFunc(s.repoMock)
-		got, err := s.usecase.CreateUser(testcase.args.input)
+		got, err := s.usecase.CreateUser(testcase.args.input, testcase.args.authUser)
 		testcase.assertFunc(got, err)
 	})
 }
 
 func (s *CreateUserUCTestSuite) Test_CreateUser_InsertDbFail() {
 	type args struct {
-		input CreateUserInput
+		input    CreateUserInput
+		authUser reqdto.AuthUser
 	}
 	type test struct {
 		name       string
@@ -191,14 +199,15 @@ func (s *CreateUserUCTestSuite) Test_CreateUser_InsertDbFail() {
 
 	s.Run(testcase.name, func() {
 		testcase.mockFunc(s.repoMock)
-		got, err := s.usecase.CreateUser(testcase.args.input)
+		got, err := s.usecase.CreateUser(testcase.args.input, testcase.args.authUser)
 		testcase.assertFunc(got, err)
 	})
 }
 
 func (s *CreateUserUCTestSuite) Test_CreateUser_Pass() {
 	type args struct {
-		input CreateUserInput
+		input    CreateUserInput
+		authUser reqdto.AuthUser
 	}
 	type test struct {
 		name       string
@@ -215,16 +224,22 @@ func (s *CreateUserUCTestSuite) Test_CreateUser_Pass() {
 		Phone:    "1234567890",
 	}
 
+	authUser := reqdto.AuthUser{
+		Id: "create_id",
+	}
+
 	testcase := &test{
 		name: "query_user_error",
 		args: args{
-			input: testInput,
+			input:    testInput,
+			authUser: authUser,
 		},
 		mockFunc: func(repoMock *repo.UserRepoMock) {
 			repoMock.On(ExistFuncStr, mock.Anything, mock.Anything, mock.Anything).Return(false, nil)
-			repoMock.On("Create", mock.MatchedBy(func(user *domain.User) bool {
-				return s.Assert().NotNil(user.Id) && s.Assert().Equal("UserName", user.UserName) && s.Assert().NotNil(user.Password)
-			})).Return(nil)
+			repoMock.On("Create", mock.MatchedBy(
+				func(user *domain.User) bool {
+					return s.Assert().NotNil(user.Id) && s.Assert().Equal("UserName", user.UserName) && s.Assert().NotNil(user.Password)
+				})).Return(nil)
 		},
 		assertFunc: func(got *CreateUserOutput, err error) {
 			s.Assert().NotNil(got)
@@ -237,13 +252,15 @@ func (s *CreateUserUCTestSuite) Test_CreateUser_Pass() {
 			s.Assert().Equal(testInput.Account, got.Account)
 			s.Assert().Equal(testInput.Email, got.Email)
 			s.Assert().Equal(testInput.Phone, got.Phone)
+			s.Assert().Equal(authUser.Id, got.CreatedBy)
+			s.Assert().Equal(authUser.Id, got.UpdatedBy)
 
 		},
 	}
 
 	s.Run(testcase.name, func() {
 		testcase.mockFunc(s.repoMock)
-		got, err := s.usecase.CreateUser(testcase.args.input)
+		got, err := s.usecase.CreateUser(testcase.args.input, testcase.args.authUser)
 		testcase.assertFunc(got, err)
 	})
 }

@@ -2,11 +2,13 @@ package usecase
 
 import (
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	"itmrchow/go-project/user/src/domain"
+	"itmrchow/go-project/user/src/infrastructure/api/reqdto"
 	"itmrchow/go-project/user/src/usecase/handler"
 	"itmrchow/go-project/user/src/usecase/repo"
 )
@@ -27,6 +29,11 @@ type CreateUserOutput struct {
 	Account  string `json:"account"`
 	Email    string `json:"email"`
 	Phone    string `json:"phone"`
+
+	CreatedBy string    `json:"createdBy"`
+	UpdatedBy string    `json:"updatedBy"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type CreateUserUseCase struct {
@@ -38,7 +45,7 @@ func NewCreateUserUseCase(userRepo repo.UserRepo, encryptionHandler handler.Encr
 	return &CreateUserUseCase{userRepo: userRepo, encryptionHandler: encryptionHandler}
 }
 
-func (c CreateUserUseCase) CreateUser(input CreateUserInput) (*CreateUserOutput, error) {
+func (c CreateUserUseCase) CreateUser(input CreateUserInput, authUser reqdto.AuthUser) (*CreateUserOutput, error) {
 
 	// 1. 欄位資料庫檢查 - 是否存在
 	isExists, err := c.userRepo.ExistsByAccountOrEmailOrPhone(input.Account, input.Email, input.Phone)
@@ -66,15 +73,23 @@ func (c CreateUserUseCase) CreateUser(input CreateUserInput) (*CreateUserOutput,
 		Password: hashStr,
 		Email:    input.Email,
 		Phone:    input.Phone,
+		DefaultModel: domain.DefaultModel{
+			CreatedBy: authUser.Id,
+			UpdatedBy: authUser.Id,
+		},
 	}
 
 	if err := c.userRepo.Create(userModel); err == nil {
 		return &CreateUserOutput{
-			Id:       userModel.Id,
-			UserName: userModel.UserName,
-			Account:  userModel.Account,
-			Email:    userModel.Email,
-			Phone:    userModel.Phone,
+			Id:        userModel.Id,
+			UserName:  userModel.UserName,
+			Account:   userModel.Account,
+			Email:     userModel.Email,
+			Phone:     userModel.Phone,
+			CreatedBy: userModel.CreatedBy,
+			UpdatedBy: userModel.UpdatedBy,
+			CreatedAt: userModel.CreatedAt,
+			UpdatedAt: userModel.UpdatedAt,
 		}, nil
 	} else if errors.Is(err, gorm.ErrDuplicatedKey) {
 		return nil, errors.Join(ErrDbInsertFail, err)

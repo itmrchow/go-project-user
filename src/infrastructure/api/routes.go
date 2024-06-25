@@ -6,6 +6,8 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"itmrchow/go-project/user/docs"
+	"itmrchow/go-project/user/src/infrastructure/api/reqdto"
+	"itmrchow/go-project/user/src/usecase"
 )
 
 var router = gin.Default()
@@ -32,4 +34,18 @@ func getRoutes() {
 	// user
 	addUserRoutes(apiV1)
 
+}
+
+func GetAuthUser(c *gin.Context) (*reqdto.AuthUser, error) {
+	authUserInfo, isExists := c.Get("AuthUser")
+	if !isExists {
+		return &reqdto.AuthUser{}, usecase.ErrUnauthorized
+	}
+
+	authUser, ok := authUserInfo.(reqdto.AuthUser)
+	if !ok {
+		return &reqdto.AuthUser{}, usecase.ErrUnauthorized
+	}
+
+	return &authUser, nil
 }

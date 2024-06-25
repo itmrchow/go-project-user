@@ -16,7 +16,7 @@ func NewUserRepoImpl(handler *database.MysqlHandler) *UserRepoImpl {
 }
 
 func (u *UserRepoImpl) Create(user *domain.User) error {
-	return u.handler.DB.Create(*user).Error
+	return u.handler.DB.Create(user).Error
 }
 
 func (u *UserRepoImpl) Get(userId string) (*domain.User, error) {

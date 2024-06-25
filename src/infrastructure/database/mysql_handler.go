@@ -34,10 +34,15 @@ type MysqlHandler struct {
 func NewMySqlHandler() (*MysqlHandler, error) {
 
 	handler := MysqlHandler{}
-	err := handler.Connect()
+	connectErr := handler.Connect()
 
-	if err != nil {
-		return nil, err
+	if connectErr != nil {
+		return nil, connectErr
+	}
+
+	migrateErr := handler.Migrate()
+	if migrateErr != nil {
+		return nil, migrateErr
 	}
 
 	return &handler, nil

@@ -165,7 +165,7 @@ func (s *GetUserUCTestSuite) Test_Login_NoUser() {
 		gotToken, err := s.usecase.Login(testcase.args)
 
 		// assert
-		s.Assert().Equal("", gotToken)
+		s.Assert().Empty(gotToken.Token)
 		s.Assert().ErrorIs(err, ErrUserNotExists)
 
 	})
@@ -213,7 +213,7 @@ func (s *GetUserUCTestSuite) Test_Login_InvalidPsw() {
 		gotToken, err := s.usecase.Login(testcase.args)
 
 		// assert
-		s.Assert().Equal("", gotToken)
+		s.Assert().Empty(gotToken.Token)
 		s.Assert().ErrorIs(err, ErrUnauthorized)
 
 	})
@@ -261,7 +261,8 @@ func (s *GetUserUCTestSuite) Test_Login_Success() {
 		gotToken, err := s.usecase.Login(testcase.args)
 
 		// assert
-		s.Assert().NotNil(gotToken)
+		s.Assert().NotNil(gotToken.Token)
+		s.Assert().NotNil(gotToken.Exp)
 		s.Assert().Nil(err)
 	})
 }

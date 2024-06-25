@@ -117,23 +117,27 @@ func getUser(c *gin.Context, controller *controllers.UserController) {
 // @Summary 建立用戶
 // @Produce json
 // @Tags User
-// @Success 200 {string} string "ok" "返回用户信息"
-// @Failure 400 {string} string "err_code：10002 参数错误； err_code：10003 校验错误"
-// @Failure 401 {string} string "err_code：10001 登录失败"
 // @Param body body reqdto.CreateUserReq true "Create user sample"
+// @Success 200 {object} respdto.CreateUserResp "返回創建用戶訊息"
+// @response default {object} respdto.ApiErrorResp "error response"
 // @Router /user [post]
 func createUser(c *gin.Context, controller *controllers.UserController) {
 
 	// context to dto
 	userReq := new(reqdto.CreateUserReq) // bind bto
-
 	if err := c.BindJSON(&userReq); err != nil {
 		c.Error(err)
 		return
 	}
 
+	authUser, err := GetAuthUser(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
 	// call controller
-	response, err := controller.CreateUser(userReq)
+	response, err := controller.CreateUser(userReq, authUser)
 	if err != nil {
 		c.Error(err)
 		return

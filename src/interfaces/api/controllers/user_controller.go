@@ -21,7 +21,7 @@ func NewUserController(
 	}
 }
 
-func (controller *UserController) CreateUser(createUserReq *reqdto.CreateUserReq) (*respdto.CreateUserResp, error) {
+func (controller *UserController) CreateUser(createUserReq *reqdto.CreateUserReq, authUser *reqdto.AuthUser) (*respdto.CreateUserResp, error) {
 
 	input := new(usecase.CreateUserInput)
 	input.Account = createUserReq.Account
@@ -30,7 +30,7 @@ func (controller *UserController) CreateUser(createUserReq *reqdto.CreateUserReq
 	input.Password = createUserReq.Password
 	input.UserName = createUserReq.UserName
 
-	out, err := controller.createUserUC.CreateUser(*input)
+	out, err := controller.createUserUC.CreateUser(*input, *authUser)
 
 	if err != nil {
 		return nil, err

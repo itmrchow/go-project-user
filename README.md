@@ -30,6 +30,10 @@ go get github.com/google/uuid
 unit test - testify
 go get github.com/stretchr/testify
 
+jwt
+go get -u github.com/golang-jwt/jwt/v5
+
+
 ```
 
 # goi18n 指令
@@ -249,9 +253,8 @@ var Set = wire.NewSet(
 ## 參考
 https://ken00535.medium.com/go-error-handling-ebbd204bcdb4
 
-```
-
-```
+# Jwt
+https://github.com/golang-jwt/jwt
 
 
 
@@ -260,10 +263,10 @@ https://ken00535.medium.com/go-error-handling-ebbd204bcdb4
 - [x] swagger
 - [x] UUID
 - [x] unit test
-- [ ] wire
-- [ ] sturct to sturct
-- [ ] response format
-- [ ] error handle
+- [x] wire
+- [x] sturct to sturct
+- [x] response format
+- [x] error handle
 
 
 # 參考

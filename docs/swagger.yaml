@@ -339,8 +339,10 @@ paths:
       tags:
       - User
 securityDefinitions:
-  BasicAuth:
-    type: basic
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
 tags:
 - description: User API

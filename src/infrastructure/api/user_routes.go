@@ -18,6 +18,12 @@ func addUserRoutes(rg *gin.RouterGroup) {
 		panic(err)
 	}
 
+	rg.POST("/login", func(c *gin.Context) {
+		loginUser(c, userController)
+	})
+
+	rg.Use(RequireAuth)
+
 	// user API
 	rg.GET("/user/:userId", func(c *gin.Context) {
 		getUser(c, userController)
@@ -36,10 +42,6 @@ func addUserRoutes(rg *gin.RouterGroup) {
 	})
 	rg.DELETE("/user/:userId", func(c *gin.Context) {
 		deleteUser(c, userController)
-	})
-
-	rg.POST("/login", func(c *gin.Context) {
-		loginUser(c, userController)
 	})
 }
 
@@ -162,6 +164,9 @@ func loginUser(c *gin.Context, controller *controllers.UserController) {
 		c.Error(err)
 		return
 	}
+
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("Authorization", resp.Token, int(resp.Exp), "", "", false, true)
 
 	c.JSON(http.StatusOK, resp)
 }

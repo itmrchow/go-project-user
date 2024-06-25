@@ -81,7 +81,10 @@ func (h *MysqlHandler) Connect() error {
 }
 
 func (m *MysqlHandler) Migrate() error {
-	return m.DB.AutoMigrate(new(domain.User))
+	return m.DB.AutoMigrate(
+		new(domain.User),
+		new(domain.Wallet),
+	)
 }
 
 func getLogger(isShowLog bool) logger.Interface {

@@ -8,6 +8,8 @@ type User struct {
 	Email        string `json:"email" gorm:"varbinary(40)"`
 	Phone        string `json:"phone" gorm:"varbinary(12)"`
 	DefaultModel `gorm:"embedded"`
+
+	Wallets []Wallet `gorm:"foreignKey:UserId"`
 }
 
 func (user *User) CheckFieId() {

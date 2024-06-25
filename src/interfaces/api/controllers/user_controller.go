@@ -21,7 +21,7 @@ func NewUserController(
 	}
 }
 
-func (controller *UserController) CreateUser(createUserReq *reqdto.CreateUserReq) (*respdto.CreateUserResp, error) {
+func (controller *UserController) CreateUser(createUserReq *reqdto.CreateUserReq, authUser *reqdto.AuthUser) (*respdto.CreateUserResp, error) {
 
 	input := new(usecase.CreateUserInput)
 	input.Account = createUserReq.Account
@@ -30,7 +30,7 @@ func (controller *UserController) CreateUser(createUserReq *reqdto.CreateUserReq
 	input.Password = createUserReq.Password
 	input.UserName = createUserReq.UserName
 
-	out, err := controller.createUserUC.CreateUser(*input)
+	out, err := controller.createUserUC.CreateUser(*input, *authUser)
 
 	if err != nil {
 		return nil, err
@@ -54,10 +54,31 @@ func (controller *UserController) GetUser(userId string) (*respdto.GetUserResp, 
 	}
 
 	return &respdto.GetUserResp{
-		Id:       out.Id,
-		UserName: out.UserName,
-		Account:  out.Account,
-		Email:    out.Email,
-		Phone:    out.Phone,
+		Id:        out.Id,
+		UserName:  out.UserName,
+		Account:   out.Account,
+		Email:     out.Email,
+		Phone:     out.Phone,
+		CreatedBy: out.CreatedBy,
+		UpdatedBy: out.UpdatedBy,
+		CreatedAt: out.CreatedAt,
+		UpdatedAt: out.UpdatedAt,
 	}, nil
+}
+
+func (controller *UserController) Login(loginReq *reqdto.LoginReq) (*respdto.LoginResp, error) {
+
+	input := usecase.LoginInput{
+		Account:  loginReq.Account,
+		Email:    loginReq.Email,
+		Password: loginReq.Password,
+		IsNoExp:  loginReq.IsNoExp,
+	}
+
+	out, err := controller.getUserUC.Login(input)
+
+	return &respdto.LoginResp{
+		Token: out.Token,
+		Exp:   out.Exp,
+	}, err
 }

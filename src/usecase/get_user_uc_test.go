@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 
 	"itmrchow/go-project/user/src/domain"
+	"itmrchow/go-project/user/src/usecase/handler"
 	"itmrchow/go-project/user/src/usecase/repo"
 )
 
@@ -18,13 +19,15 @@ func TestGetUserSuite(t *testing.T) {
 
 type GetUserUCTestSuite struct {
 	suite.Suite
-	repoMock *repo.UserRepoMock
-	usecase  *GetUserUseCase
+	repoMock              *repo.UserRepoMock
+	encryptionHandlerMock *handler.EncryptionHandlerMock
+	usecase               *GetUserUseCase
 }
 
 func (s *GetUserUCTestSuite) SetupTest() {
 	s.repoMock = &repo.UserRepoMock{}
-	s.usecase = NewGetUserUseCase(s.repoMock)
+	s.encryptionHandlerMock = &handler.EncryptionHandlerMock{}
+	s.usecase = NewGetUserUseCase(s.repoMock, s.encryptionHandlerMock)
 }
 
 func (s *GetUserUCTestSuite) Test_GetUser_NoUser() {
@@ -126,4 +129,140 @@ func (s *GetUserUCTestSuite) Test_GetUser_HasUser() {
 
 	s.Assert().EqualValues(got, testcase.want)
 	s.Assert().Nil(err)
+}
+
+// Login_Test
+
+func (s *GetUserUCTestSuite) Test_Login_NoUser() {
+	type test struct {
+		name     string
+		args     LoginInput
+		mockFunc func(repoMock *repo.UserRepoMock)
+		want     string
+		wantErr  error
+	}
+
+	testcase := &test{
+		name: "NoUser",
+		args: LoginInput{
+			Account:  "Account",
+			Email:    "Email",
+			Password: "XXXXXXXX",
+		},
+		mockFunc: func(repoMock *repo.UserRepoMock) {
+			repoMock.On("GetByAccountOrEmail", mock.Anything, mock.Anything).Return(nil, gorm.ErrRecordNotFound)
+		},
+		want:    "",
+		wantErr: ErrUserNotExists,
+	}
+
+	s.Run(testcase.name, func() {
+
+		// mock
+		testcase.mockFunc(s.repoMock)
+
+		// run
+		gotToken, err := s.usecase.Login(testcase.args)
+
+		// assert
+		s.Assert().Empty(gotToken.Token)
+		s.Assert().ErrorIs(err, ErrUserNotExists)
+
+	})
+}
+
+func (s *GetUserUCTestSuite) Test_Login_InvalidPsw() {
+	type test struct {
+		name     string
+		args     LoginInput
+		mockFunc func(repoMock *repo.UserRepoMock, encrypMock *handler.EncryptionHandlerMock)
+		want     string
+		wantErr  error
+	}
+
+	testcase := &test{
+		name: "InvalidPsw",
+		args: LoginInput{
+			Account:  "Account",
+			Email:    "Email",
+			Password: "XXXXXXXX",
+		},
+		mockFunc: func(repoMock *repo.UserRepoMock, encrypMock *handler.EncryptionHandlerMock) {
+			repoMock.On("GetByAccountOrEmail", mock.Anything, mock.Anything).Return(
+				&domain.User{
+					Id:       "id",
+					UserName: "UserName",
+					Account:  "Account",
+					Password: "12345678",
+					Email:    "Email",
+					Phone:    "Phone",
+				}, nil)
+
+			encrypMock.On("CheckPasswordHash", mock.Anything, mock.Anything).Return(false)
+		},
+		want:    "",
+		wantErr: ErrUnauthorized,
+	}
+
+	s.Run(testcase.name, func() {
+
+		// mock
+		testcase.mockFunc(s.repoMock, s.encryptionHandlerMock)
+
+		// run
+		gotToken, err := s.usecase.Login(testcase.args)
+
+		// assert
+		s.Assert().Empty(gotToken.Token)
+		s.Assert().ErrorIs(err, ErrUnauthorized)
+
+	})
+}
+
+func (s *GetUserUCTestSuite) Test_Login_Success() {
+	type test struct {
+		name     string
+		args     LoginInput
+		mockFunc func(repoMock *repo.UserRepoMock, encrypMock *handler.EncryptionHandlerMock)
+		want     string
+		wantErr  error
+	}
+
+	testcase := &test{
+		name: "JWTError",
+		args: LoginInput{
+			Account:  "Account",
+			Email:    "Email",
+			Password: "XXXXXXXX",
+		},
+		mockFunc: func(repoMock *repo.UserRepoMock, encrypMock *handler.EncryptionHandlerMock) {
+			repoMock.On("GetByAccountOrEmail", mock.Anything, mock.Anything).Return(
+				&domain.User{
+					Id:       "id",
+					UserName: "UserName",
+					Account:  "Account",
+					Password: "12345678",
+					Email:    "Email",
+					Phone:    "Phone",
+				}, nil)
+
+			encrypMock.On("CheckPasswordHash", mock.Anything, mock.Anything).Return(true)
+		},
+		want:    "",
+		wantErr: ErrUnauthorized,
+	}
+
+	s.Run(testcase.name, func() {
+
+		// mock
+		testcase.mockFunc(s.repoMock, s.encryptionHandlerMock)
+
+		// run
+		gotToken, err := s.usecase.Login(testcase.args)
+
+		// assert
+		s.Assert().NotNil(gotToken.Token)
+		s.Assert().NotNil(gotToken.Exp)
+		s.Assert().Nil(err)
+	})
 }

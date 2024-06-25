@@ -16,7 +16,7 @@ func NewUserRepoImpl(handler *database.MysqlHandler) *UserRepoImpl {
 }
 
 func (u *UserRepoImpl) Create(user *domain.User) error {
-	return u.handler.DB.Create(*user).Error
+	return u.handler.DB.Create(user).Error
 }
 
 func (u *UserRepoImpl) Get(userId string) (*domain.User, error) {
@@ -36,4 +36,11 @@ func (u *UserRepoImpl) ExistsByAccountOrEmailOrPhone(account string, email strin
 	} else {
 		return count > 0, nil
 	}
+}
+
+func (u *UserRepoImpl) GetByAccountOrEmail(account string, email string) (*domain.User, error) {
+	var user = domain.User{Account: account, Email: email}
+	result := u.handler.DB.First(&user)
+
+	return &user, result.Error
 }

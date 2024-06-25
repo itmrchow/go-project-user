@@ -15,7 +15,9 @@ import (
 // @version         1.0
 // @description     User Service API
 
-// @securityDefinitions.basic  BasicAuth
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 
 // @tag.name User
 // @tag.description User API

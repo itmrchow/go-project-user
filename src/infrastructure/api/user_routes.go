@@ -18,6 +18,12 @@ func addUserRoutes(rg *gin.RouterGroup) {
 		panic(err)
 	}
 
+	rg.POST("/login", func(c *gin.Context) {
+		loginUser(c, userController)
+	})
+
+	rg.Use(RequireAuth)
+
 	// user API
 	rg.GET("/user/:userId", func(c *gin.Context) {
 		getUser(c, userController)
@@ -37,8 +43,6 @@ func addUserRoutes(rg *gin.RouterGroup) {
 	rg.DELETE("/user/:userId", func(c *gin.Context) {
 		deleteUser(c, userController)
 	})
-
-	rg.POST("/login", loginUser)
 }
 
 // @Summary 刪除用戶 by Id
@@ -113,23 +117,27 @@ func getUser(c *gin.Context, controller *controllers.UserController) {
 // @Summary 建立用戶
 // @Produce json
 // @Tags User
-// @Success 200 {string} string "ok" "返回用户信息"
-// @Failure 400 {string} string "err_code：10002 参数错误； err_code：10003 校验错误"
-// @Failure 401 {string} string "err_code：10001 登录失败"
 // @Param body body reqdto.CreateUserReq true "Create user sample"
+// @Success 200 {object} respdto.CreateUserResp "返回創建用戶訊息"
+// @response default {object} respdto.ApiErrorResp "error response"
 // @Router /user [post]
 func createUser(c *gin.Context, controller *controllers.UserController) {
 
 	// context to dto
 	userReq := new(reqdto.CreateUserReq) // bind bto
-
 	if err := c.BindJSON(&userReq); err != nil {
 		c.Error(err)
 		return
 	}
 
+	authUser, err := GetAuthUser(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
 	// call controller
-	response, err := controller.CreateUser(userReq)
+	response, err := controller.CreateUser(userReq, authUser)
 	if err != nil {
 		c.Error(err)
 		return
@@ -141,22 +149,28 @@ func createUser(c *gin.Context, controller *controllers.UserController) {
 // @Summary 登入
 // @Produce json
 // @Tags User
-// @Success 200 {string} string "ok" "返回用户信息"
-// @Failure 400 {string} string "err_code：10002 参数错误； err_code：10003 校验错误"
-// @Failure 401 {string} string "err_code：10001 登录失败"
+// @Param body body reqdto.LoginReq true "Login sample , account 和 email 需擇一輸入"
+// @Success 200 {object} respdto.LoginResp "返回token訊息"
+// @response default {object} respdto.ApiErrorResp "error response"
 // @Router /login [post]
-func loginUser(c *gin.Context) {
+func loginUser(c *gin.Context, controller *controllers.UserController) {
+	// bind req
 	loginReq := new(reqdto.LoginReq)
-	// check account
-	isAuth := AuthUser(loginReq.Account, loginReq.Password)
 
-	if isAuth {
-		c.JSON(http.StatusOK, gin.H{"token": "token"})
-	} else {
-		c.JSON(http.StatusUnauthorized, gin.H{"msg": "account or password is wrong"})
+	if err := c.BindJSON(&loginReq); err != nil {
+		c.Error(err)
+		return
 	}
-}
 
-func AuthUser(account string, password string) bool {
-	return true
+	resp, err := controller.Login(loginReq)
+
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("Authorization", resp.Token, int(resp.Exp), "", "", false, true)
+
+	c.JSON(http.StatusOK, resp)
 }

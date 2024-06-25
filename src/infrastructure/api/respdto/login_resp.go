@@ -1,0 +1,6 @@
+package respdto
+
+type LoginResp struct {
+	Token string `json:"token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50IjoiamVmZjc3NzciLCJlbWFpbCI6ImplZmZAZ21haWwuY29tIiwiZXhwIjoxNzE5MjE4ODM2LCJpZCI6ImZhNzkxODE2LWRkMzUtNDJlNi1hNDc1LTAwZjg3ZDRhYzlhYSIsInBob25lIjoiKzg4Njk1NTU1NTU1NSIsInVzZXJOYW1lIjoiSmVmZiJ9.ALccbWnDW4Tg6NvIS8aCw3B96okQ3gLVqiEz3Ukq_eA"`
+	Exp   int64  `json:"exp" example:"1719218836"`
+}

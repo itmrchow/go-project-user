@@ -35,3 +35,15 @@ func (m *UserRepoMock) ExistsByAccountOrEmailOrPhone(account string, email strin
 	args := m.Called(account, email, phone)
 	return args.Bool(0), args.Error(1)
 }
+
+func (m *UserRepoMock) GetByAccountOrEmail(account string, email string) (*domain.User, error) {
+	args := m.Called(account, email)
+
+	user, err := args.Get(0), args.Error(1)
+
+	if user == nil {
+		return nil, err
+	}
+
+	return user.(*domain.User), err
+}

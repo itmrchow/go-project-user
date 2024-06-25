@@ -30,6 +30,22 @@ definitions:
     - phone
     - userName
     type: object
+  reqdto.LoginReq:
+    properties:
+      account:
+        example: jeff7777
+        type: string
+      email:
+        example: jeff@gmail.com
+        type: string
+      password:
+        example: password
+        maxLength: 20
+        minLength: 8
+        type: string
+    required:
+    - password
+    type: object
   reqdto.PatchUserReq:
     properties:
       account:
@@ -77,6 +93,28 @@ definitions:
           Status   int    `json:"status,omitempty"`   // http status
         type: string
     type: object
+  respdto.CreateUserResp:
+    properties:
+      account:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      phone:
+        type: string
+      userName:
+        type: string
+    type: object
+  respdto.LoginResp:
+    properties:
+      exp:
+        example: 1719218836
+        type: integer
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50IjoiamVmZjc3NzciLCJlbWFpbCI6ImplZmZAZ21haWwuY29tIiwiZXhwIjoxNzE5MjE4ODM2LCJpZCI6ImZhNzkxODE2LWRkMzUtNDJlNi1hNDc1LTAwZjg3ZDRhYzlhYSIsInBob25lIjoiKzg4Njk1NTU1NTU1NSIsInVzZXJOYW1lIjoiSmVmZiJ9.ALccbWnDW4Tg6NvIS8aCw3B96okQ3gLVqiEz3Ukq_eA
+        type: string
+    type: object
 info:
   contact: {}
   description: User Service API
@@ -100,21 +138,24 @@ paths:
       - Example
   /login:
     post:
+      parameters:
+      - description: Login sample , account 和 email 需擇一輸入
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/reqdto.LoginReq'
       produces:
       - application/json
       responses:
         "200":
-          description: ok" "返回用户信息
+          description: 返回token訊息
           schema:
-            type: string
-        "400":
-          description: err_code：10002 参数错误； err_code：10003 校验错误
+            $ref: '#/definitions/respdto.LoginResp'
+        default:
+          description: error response
           schema:
-            type: string
-        "401":
-          description: err_code：10001 登录失败
-          schema:
-            type: string
+            $ref: '#/definitions/respdto.ApiErrorResp'
       summary: 登入
       tags:
       - User
@@ -150,17 +191,13 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok" "返回用户信息
+          description: 返回創建用戶訊息
           schema:
-            type: string
-        "400":
-          description: err_code：10002 参数错误； err_code：10003 校验错误
+            $ref: '#/definitions/respdto.CreateUserResp'
+        default:
+          description: error response
           schema:
-            type: string
-        "401":
-          description: err_code：10001 登录失败
-          schema:
-            type: string
+            $ref: '#/definitions/respdto.ApiErrorResp'
       summary: 建立用戶
       tags:
       - User
@@ -311,8 +348,10 @@ paths:
       tags:
       - User
 securityDefinitions:
-  BasicAuth:
-    type: basic
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
 tags:
 - description: User API

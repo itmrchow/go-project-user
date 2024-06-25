@@ -12,6 +12,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/spf13/viper"
 
+	"itmrchow/go-project/user/src/infrastructure/api/reqdto"
 	"itmrchow/go-project/user/src/infrastructure/api/respdto"
 )
 
@@ -67,7 +68,7 @@ func RequireAuth(c *gin.Context) {
 		return
 	}
 
-	c.Set("User", token.Claims.(jwt.MapClaims))
+	c.Set("AuthUser", getAuthUser((token.Claims).(jwt.MapClaims)))
 
 	c.Next()
 }
@@ -84,4 +85,15 @@ func CheckClaims(claims jwt.Claims) error {
 	}
 
 	return nil
+}
+
+func getAuthUser(claims jwt.MapClaims) reqdto.AuthUser {
+
+	return reqdto.AuthUser{
+		Id:       claims["id"].(string),
+		UserName: claims["userName"].(string),
+		Account:  claims["account"].(string),
+		Email:    claims["email"].(string),
+		Phone:    claims["phone"].(string),
+	}
 }

@@ -1,10 +1,12 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -30,33 +32,56 @@ func RequireAuth(c *gin.Context) {
 	}
 
 	// parse token
-	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-		}
+	token, parseErr := jwt.Parse(
+		tokenStr,
+		func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			}
 
-		key := []byte(viper.GetString("privatekey"))
-		return key, nil
-	})
-	if err != nil {
-		log.Println(err)
+			key := []byte(viper.GetString("privatekey"))
+			return key, nil
+		})
+
+	if parseErr != nil {
+		log.Println(parseErr)
 		c.AbortWithStatusJSON(
 			http.StatusUnauthorized,
 			respdto.ApiErrorResp{
 				Title:  "Unauthorized",
-				Detail: err.Error(),
+				Detail: parseErr.Error(),
 			},
 		)
 		return
 	}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		fmt.Println(claims["foo"], claims["nbf"])
-	} else {
-		fmt.Println(err)
+	checkClaimsErr := CheckClaims(token.Claims)
+	if checkClaimsErr != nil {
+		c.AbortWithStatusJSON(
+			http.StatusUnauthorized,
+			respdto.ApiErrorResp{
+				Title:  "Unauthorized",
+				Detail: checkClaimsErr.Error(),
+			},
+		)
+		return
 	}
 
-	println("token:" + tokenStr)
+	c.Set("User", token.Claims.(jwt.MapClaims))
 
 	c.Next()
+}
+
+func CheckClaims(claims jwt.Claims) error {
+	if claims, ok := claims.(jwt.MapClaims); ok {
+
+		if float64(time.Now().Unix()) > claims["exp"].(float64) {
+			return errors.New("token has expired")
+		}
+
+	} else {
+		return errors.New("claims is not mapclaims")
+	}
+
+	return nil
 }

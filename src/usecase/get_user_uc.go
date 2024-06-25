@@ -16,6 +16,7 @@ type LoginInput struct {
 	Account  string
 	Email    string
 	Password string
+	IsNoExp  bool
 }
 
 type GetUserUseCase struct {
@@ -90,7 +91,16 @@ func (c GetUserUseCase) Login(loginInput LoginInput) (LoginOutput, error) {
 	// create token & return
 	key := []byte(viper.GetString("privatekey"))
 
-	exp := time.Now().Add(time.Hour).Unix()
+	var exp int64
+
+	if loginInput.IsNoExp {
+		now := time.Now()
+		println(now.Unix())
+		exp = now.AddDate(1, 0, 0).Unix()
+		println(exp)
+	} else {
+		exp = time.Now().Add(time.Hour).Unix()
+	}
 
 	t := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,

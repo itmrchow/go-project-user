@@ -72,6 +72,7 @@ func (controller *UserController) Login(loginReq *reqdto.LoginReq) (*respdto.Log
 		Account:  loginReq.Account,
 		Email:    loginReq.Email,
 		Password: loginReq.Password,
+		IsNoExp:  loginReq.IsNoExp,
 	}
 
 	out, err := controller.getUserUC.Login(input)

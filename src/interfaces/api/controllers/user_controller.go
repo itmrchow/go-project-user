@@ -54,11 +54,15 @@ func (controller *UserController) GetUser(userId string) (*respdto.GetUserResp, 
 	}
 
 	return &respdto.GetUserResp{
-		Id:       out.Id,
-		UserName: out.UserName,
-		Account:  out.Account,
-		Email:    out.Email,
-		Phone:    out.Phone,
+		Id:        out.Id,
+		UserName:  out.UserName,
+		Account:   out.Account,
+		Email:     out.Email,
+		Phone:     out.Phone,
+		CreatedBy: out.CreatedBy,
+		UpdatedBy: out.UpdatedBy,
+		CreatedAt: out.CreatedAt,
+		UpdatedAt: out.UpdatedAt,
 	}, nil
 }
 

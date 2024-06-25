@@ -32,11 +32,15 @@ func NewGetUserUseCase(userRepo repo.UserRepo, encryptionHandler handler.Encrypt
 
 // 定義output
 type GetUserOutput struct {
-	Id       string `json:"id"`
-	UserName string `json:"userName"`
-	Account  string `json:"account"`
-	Email    string `json:"email"`
-	Phone    string `json:"phone"`
+	Id        string    `json:"id"`
+	UserName  string    `json:"userName"`
+	Account   string    `json:"account"`
+	Email     string    `json:"email"`
+	Phone     string    `json:"phone"`
+	CreatedBy string    `json:"CreatedBy"`
+	UpdatedBy string    `json:"UpdatedBy"`
+	CreatedAt time.Time `json:"CreatedAt"`
+	UpdatedAt time.Time `json:"UpdatedAt"`
 }
 
 func (c GetUserUseCase) GetUser(userId string) (*GetUserOutput, error) {
@@ -44,11 +48,15 @@ func (c GetUserUseCase) GetUser(userId string) (*GetUserOutput, error) {
 
 	if err == nil {
 		return &GetUserOutput{
-			Id:       user.Id,
-			UserName: user.UserName,
-			Account:  user.Account,
-			Email:    user.Email,
-			Phone:    user.Phone,
+			Id:        user.Id,
+			UserName:  user.UserName,
+			Account:   user.Account,
+			Email:     user.Email,
+			Phone:     user.Phone,
+			CreatedBy: user.CreatedBy,
+			UpdatedBy: user.UpdatedBy,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
 		}, nil
 
 	} else if errors.Is(err, gorm.ErrRecordNotFound) {

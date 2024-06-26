@@ -1,7 +1,6 @@
 package repo_impl
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -65,35 +64,26 @@ func (s *WalletRepoImplTestSuite) TestWalletRepoImpl_Create() {
 	})
 }
 
-func TestWalletRepoImpl_Get(t *testing.T) {
-	type fields struct {
-		handler *database.MysqlHandler
+func (s *WalletRepoImplTestSuite) TestWalletRepoImpl_Find() {
+	s.T().Skip()
+
+	type test struct {
+		name       string
+		assertFunc func(wallets []domain.Wallet, err error)
 	}
-	type args struct {
-		walletId string
+
+	testcase := &test{
+		name: "Test Find",
+		assertFunc: func(wallets []domain.Wallet, err error) {
+			s.Assert().Len(wallets, 2)
+		},
 	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *domain.Wallet
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			w := &WalletRepoImpl{
-				handler: tt.fields.handler,
-			}
-			got, err := w.Get(tt.args.walletId)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("WalletRepoImpl.Get() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("WalletRepoImpl.Get() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+
+	s.Run(testcase.name, func() {
+		query := &domain.Wallet{UserId: "fa791816-dd35-42e6-a475-00f87d4ac9aa", WalletType: enum.WalletType.PLATFORM}
+
+		wallets, err := s.repoImpl.Find(query)
+
+		testcase.assertFunc(wallets, err)
+	})
 }

@@ -1,15 +1,28 @@
 package initialization
 
 import (
+	"os"
+	"strings"
+
 	"github.com/spf13/viper"
 
 	"itmrchow/go-project/user/src/infrastructure/database"
 )
 
 func SetConfig() {
+
+	path, err := os.Getwd()
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	prefix := path[:(strings.Index(path, "go-project-user"))]
+	path = prefix + "go-project-user/config"
+
 	viper.SetConfigName("app")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("./config")
+	viper.AddConfigPath(path)
 
 	if err := viper.ReadInConfig(); err != nil {
 		panic("read config error: " + err.Error())

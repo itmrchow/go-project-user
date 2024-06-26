@@ -26,26 +26,23 @@ type DbConfig struct {
 	IsShowLog bool
 }
 
+var mysqlHandler MysqlHandler
+
 type MysqlHandler struct {
 	DB     *gorm.DB
 	config DbConfig
 }
 
 func NewMySqlHandler() (*MysqlHandler, error) {
+	if mysqlHandler.DB == nil {
+		connectErr := mysqlHandler.Connect()
 
-	handler := MysqlHandler{}
-	connectErr := handler.Connect()
-
-	if connectErr != nil {
-		return nil, connectErr
+		if connectErr != nil {
+			return nil, connectErr
+		}
 	}
 
-	migrateErr := handler.Migrate()
-	if migrateErr != nil {
-		return nil, migrateErr
-	}
-
-	return &handler, nil
+	return &mysqlHandler, nil
 }
 
 func (h *MysqlHandler) Connect() error {

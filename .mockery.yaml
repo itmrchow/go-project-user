@@ -1,0 +1,12 @@
+with-expecter: true
+packages:
+    itmrchow/go-project/user/src/usecase/repo:
+        # place your package-specific config here
+        config:
+          filename: "{{.InterfaceNameSnake}}_mock.go"
+          dir: "{{.InterfaceDir}}/mocks"
+        interfaces:
+            # select the interfaces you want mocked
+            WalletRepo:
+                # Modify package-level config for this specific interface (if applicable)
+                config:

@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 
 	"itmrchow/go-project/user/src/domain"
+	"itmrchow/go-project/user/src/domain/enum"
 	"itmrchow/go-project/user/src/infrastructure/api/reqdto"
 	"itmrchow/go-project/user/src/usecase/handler"
 	"itmrchow/go-project/user/src/usecase/repo"
@@ -78,6 +79,17 @@ func (c CreateUserUseCase) CreateUser(input CreateUserInput, authUser reqdto.Aut
 			UpdatedBy: authUser.Id,
 		},
 	}
+
+	walletModel := domain.Wallet{
+		WalletType: enum.WalletType.PLATFORM,
+		Currency:   enum.Currency.PHP,
+		DefaultModel: domain.DefaultModel{
+			CreatedBy: authUser.Id,
+			UpdatedBy: authUser.Id,
+		},
+	}
+
+	userModel.Wallets = append(userModel.Wallets, walletModel)
 
 	if err := c.userRepo.Create(userModel); err == nil {
 		return &CreateUserOutput{

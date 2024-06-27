@@ -256,7 +256,15 @@ https://ken00535.medium.com/go-error-handling-ebbd204bcdb4
 # Jwt
 https://github.com/golang-jwt/jwt
 
-
+# Copier - sturct to sturct
+https://github.com/jinzhu/copier
+```
+go get github.com/jinzhu/copier
+```
+example
+```
+copier.Copy(&userOut, &user)
+```
 
 
 # Todo

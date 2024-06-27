@@ -2,8 +2,10 @@ package usecase
 
 import (
 	"errors"
+	"strings"
 	"time"
 
+	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
 
 	"itmrchow/go-project/user/src/domain"
@@ -40,33 +42,28 @@ type CreateWalletOutput struct {
 func (u *WalletUseCase) CreateWallet(input *CreateWalletInput, authUser reqdto.AuthUser) (*CreateWalletOutput, error) {
 
 	wallet := domain.Wallet{
-		UserId:     input.UserId,
-		WalletType: input.WalletType,
-		Currency:   input.Currency,
-		Balance:    input.Balance,
 		DefaultModel: domain.DefaultModel{
 			CreatedBy: authUser.Id,
 			UpdatedBy: authUser.Id,
 		},
 	}
 
-	err := u.walletRepo.Create(&wallet)
+	if err := copier.Copy(&wallet, &input); err != nil {
+		return nil, err
+	}
 
-	if err == nil {
-		return &CreateWalletOutput{
-			UserId:     wallet.UserId,
-			WalletType: wallet.WalletType,
-			Currency:   wallet.Currency,
-			Balance:    wallet.Balance,
-			CreatedBy:  wallet.DefaultModel.CreatedBy,
-			UpdatedBy:  wallet.DefaultModel.UpdatedBy,
-			CreatedAt:  wallet.DefaultModel.CreatedAt,
-			UpdatedAt:  wallet.DefaultModel.UpdatedAt,
-		}, nil
-	} else if errors.Is(err, gorm.ErrDuplicatedKey) {
-		return nil, errors.Join(ErrDataExists, err)
-	} else {
+	if err := u.walletRepo.Create(&wallet); err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) || strings.Contains(err.Error(), "Duplicate entry") {
+			return nil, errors.Join(ErrDataExists, err)
+		}
 		return nil, errors.Join(ErrDbInsertFail, err)
 	}
+
+	out := CreateWalletOutput{}
+	if err := copier.Copy(&out, &wallet); err != nil {
+		return nil, err
+	}
+
+	return &out, nil
 
 }

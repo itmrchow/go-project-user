@@ -41,7 +41,24 @@ func (c *WalletController) CreateWallet(createWalletReq *reqdto.CreateWalletReq,
 
 func (c *WalletController) FindWallets(req *reqdto.FindWalletsReq, authUser *reqdto.AuthUser) (*[]respdto.FindWalletResp, error) {
 
+	input := usecase.FindWalletInput{
+		UserId: authUser.Id,
+	}
+
+	if err := copier.Copy(&input, &req); err != nil {
+		return nil, err
+	}
+
+	out, err := c.walletUC.FindWallet(&input)
+
+	if err != nil {
+		return nil, err
+	}
+
 	respSlice := []respdto.FindWalletResp{}
+	if err := copier.Copy(&respSlice, out); err != nil {
+		return nil, err
+	}
 
 	return &respSlice, nil
 }

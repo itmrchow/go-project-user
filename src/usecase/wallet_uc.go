@@ -65,5 +65,27 @@ func (u *WalletUseCase) CreateWallet(input *CreateWalletInput, authUser reqdto.A
 	}
 
 	return &out, nil
+}
 
+type FindWalletInput struct {
+	UserId     string
+	WalletType string
+	Currency   string
+}
+type FindWalletOutput struct {
+	UserId     string
+	WalletType string
+	Currency   string
+	Balance    float64
+	CreatedBy  string
+	UpdatedBy  string
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+}
+
+func (u *WalletUseCase) FindWallet(input *FindWalletInput) (*[]FindWalletOutput, error) {
+
+	outSlice := []FindWalletOutput{}
+
+	return &outSlice, nil
 }

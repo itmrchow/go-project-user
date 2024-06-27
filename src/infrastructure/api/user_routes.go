@@ -130,11 +130,7 @@ func createUser(c *gin.Context, controller *controllers.UserController) {
 		return
 	}
 
-	authUser, err := GetAuthUser(c)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
-		return
-	}
+	authUser := GetAuthUser(c)
 
 	// call controller
 	response, err := controller.CreateUser(userReq, authUser)

@@ -1,6 +1,8 @@
 package api
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -34,18 +36,21 @@ func getRoutes() {
 	// user
 	addUserRoutes(apiV1)
 
+	// wallet
+	addWalletRoutes(apiV1)
+
 }
 
-func GetAuthUser(c *gin.Context) (*reqdto.AuthUser, error) {
+func GetAuthUser(c *gin.Context) *reqdto.AuthUser {
 	authUserInfo, isExists := c.Get("AuthUser")
 	if !isExists {
-		return &reqdto.AuthUser{}, usecase.ErrUnauthorized
+		c.JSON(http.StatusUnauthorized, gin.H{"error": usecase.ErrUnauthorized})
 	}
 
 	authUser, ok := authUserInfo.(reqdto.AuthUser)
 	if !ok {
-		return &reqdto.AuthUser{}, usecase.ErrUnauthorized
+		c.JSON(http.StatusUnauthorized, gin.H{"error": usecase.ErrUnauthorized})
 	}
 
-	return &authUser, nil
+	return &authUser
 }

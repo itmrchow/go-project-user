@@ -43,12 +43,23 @@ func InitPingController() (*controllers.PingController, error) {
 	return pingController, nil
 }
 
+func InitWalletController() (*controllers.WalletController, error) {
+	mysqlHandler, err := database.NewMySqlHandler()
+	if err != nil {
+		return nil, err
+	}
+	walletRepoImpl := repo_impl.NewWalletRepoImpl(mysqlHandler)
+	walletUseCase := usecase.NewWalletUseCase(walletRepoImpl)
+	walletController := controllers.NewWalletController(walletUseCase)
+	return walletController, nil
+}
+
 // wire.go:
 
 var dbSet = wire.NewSet(database.NewMySqlHandler)
 
-var repoSet = wire.NewSet(repo_impl.NewUserRepoImpl, wire.Bind(new(repo.UserRepo), new(*repo_impl.UserRepoImpl)))
+var repoSet = wire.NewSet(repo_impl.NewUserRepoImpl, wire.Bind(new(repo.UserRepo), new(*repo_impl.UserRepoImpl)), repo_impl.NewWalletRepoImpl, wire.Bind(new(repo.WalletRepo), new(*repo_impl.WalletRepoImpl)))
 
 var handlerSet = wire.NewSet(handlerimpl.NewBcryptHandler, wire.Bind(new(handler.EncryptionHandler), new(*handlerimpl.BcryptHandler)))
 
-var usecaseSet = wire.NewSet(usecase.NewCreateUserUseCase, usecase.NewGetUserUseCase, usecase.NewPingServiceImpl, wire.Bind(new(usecase.PingService), new(*usecase.PingServiceImpl)))
+var usecaseSet = wire.NewSet(usecase.NewCreateUserUseCase, usecase.NewGetUserUseCase, usecase.NewWalletUseCase, usecase.NewPingServiceImpl, wire.Bind(new(usecase.PingService), new(*usecase.PingServiceImpl)))

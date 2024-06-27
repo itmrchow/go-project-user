@@ -1,0 +1,82 @@
+package api
+
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+
+	"itmrchow/go-project/user/config"
+	"itmrchow/go-project/user/src/infrastructure/api/reqdto"
+	"itmrchow/go-project/user/src/interfaces/api/controllers"
+)
+
+func addWalletRoutes(rg *gin.RouterGroup) {
+
+	walletController, err := config.InitWalletController()
+
+	if err != nil {
+		panic(err)
+	}
+
+	rg.Use(RequireAuth)
+
+	rg.POST("/wallet", func(c *gin.Context) {
+		createWallet(c, walletController)
+	})
+
+}
+
+// @Summary 取得錢包
+// @Produce json
+// @Tags Wallet
+// @Param userId     path string true "User Id"
+// @Param walletType path string true "Wallet Type"
+// @Success 200 {object} respdto.GetWalletResp "返回錢包訊息"
+// @response default {object} respdto.ApiErrorResp "error response"
+// @Router /Wallet/{userId}/{walletType} [GET]
+func getWallet(c *gin.Context, controller *controllers.UserController) {
+	panic("unimplemented")
+}
+
+// @Summary 查詢錢包
+// @Produce json
+// @Tags Wallet
+// @Parameters.QueryParams
+// @Param userName query string false "User Name"
+// @Param email query string false "User Email"
+// @Param phone query string false "User Phone"
+// @Success 200 {string} string "ok" "返回用户信息"
+// @response default {object} respdto.ApiErrorResp "error response"
+// @Router /Wallets [GET]
+func findWallets(c *gin.Context, controller *controllers.UserController) {
+
+	panic("unimplemented")
+}
+
+// @Summary 建立錢包
+// @Produce json
+// @Tags Wallet
+// @Param body body reqdto.CreateWalletReq true "Create wallet sample"
+// @Success 200 {object} respdto.CreateWalletResp "返回建立錢包訊息"
+// @response default {object} respdto.ApiErrorResp "error response"
+// @Router /wallet [post]
+func createWallet(c *gin.Context, controller *controllers.WalletController) {
+
+	// context to dto
+	walletReq := new(reqdto.CreateWalletReq) // bind bto
+	if err := c.BindJSON(&walletReq); err != nil {
+		c.Error(err)
+		return
+	}
+
+	authUser := GetAuthUser(c)
+
+	// call controller
+	response, err := controller.CreateWallet(walletReq, authUser)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
+}

@@ -56,7 +56,7 @@ func findWallets(c *gin.Context, controller *controllers.WalletController) {
 
 	// context to dto
 	req := new(reqdto.FindWalletsReq) // bind bto
-	if err := c.BindJSON(&req); err != nil {
+	if err := c.BindQuery(&req); err != nil {
 		c.Error(err)
 		return
 	}

@@ -15,92 +15,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/Wallet/{userId}/{walletType}": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Wallet"
-                ],
-                "summary": "取得錢包",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User Id",
-                        "name": "userId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Wallet Type",
-                        "name": "walletType",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "返回錢包訊息",
-                        "schema": {
-                            "$ref": "#/definitions/respdto.GetWalletResp"
-                        }
-                    },
-                    "default": {
-                        "description": "error response",
-                        "schema": {
-                            "$ref": "#/definitions/respdto.ApiErrorResp"
-                        }
-                    }
-                }
-            }
-        },
-        "/Wallets": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Wallet"
-                ],
-                "summary": "查詢錢包",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User Name",
-                        "name": "userName",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "User Email",
-                        "name": "email",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "User Phone",
-                        "name": "phone",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "ok\" \"返回用户信息",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "default": {
-                        "description": "error response",
-                        "schema": {
-                            "$ref": "#/definitions/respdto.ApiErrorResp"
-                        }
-                    }
-                }
-            }
-        },
         "/helloworld": {
             "get": {
                 "description": "do ping",
@@ -483,6 +397,99 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/wallet/{userId}/{walletType}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "取得錢包",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Id",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Wallet Type",
+                        "name": "walletType",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回錢包訊息",
+                        "schema": {
+                            "$ref": "#/definitions/respdto.GetWalletResp"
+                        }
+                    },
+                    "default": {
+                        "description": "error response",
+                        "schema": {
+                            "$ref": "#/definitions/respdto.ApiErrorResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/wallets": {
+            "get": {
+                "description": "\"查找User所屬的錢包\"",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "查詢錢包",
+                "parameters": [
+                    {
+                        "enum": [
+                            "P"
+                        ],
+                        "type": "string",
+                        "description": "錢包類型",
+                        "name": "walletType",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "PHP",
+                            "USD",
+                            "BTC",
+                            "USDT"
+                        ],
+                        "type": "string",
+                        "description": "幣別",
+                        "name": "currency",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok\" \"返回錢包查詢訊息",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/respdto.FindWalletResp"
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "error response",
+                        "schema": {
+                            "$ref": "#/definitions/respdto.ApiErrorResp"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -685,6 +692,37 @@ const docTemplate = `{
                 "userId": {
                     "type": "string",
                     "example": "Jeff"
+                }
+            }
+        },
+        "respdto.FindWalletResp": {
+            "type": "object",
+            "properties": {
+                "WalletType": {
+                    "type": "string"
+                },
+                "balance": {
+                    "description": "餘額",
+                    "type": "number"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "createdBy": {
+                    "type": "string"
+                },
+                "currency": {
+                    "description": "幣別",
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "updatedBy": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
                 }
             }
         },

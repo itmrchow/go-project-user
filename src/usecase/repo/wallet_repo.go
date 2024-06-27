@@ -1,3 +1,4 @@
+//go:generate mockery --name WalletRepo
 package repo
 
 import "itmrchow/go-project/user/src/domain"

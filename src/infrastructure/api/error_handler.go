@@ -41,7 +41,7 @@ func ErrorHandle() gin.HandlerFunc {
 
 func setErrResp(err error) (status int, errResp respdto.ApiErrorResp) {
 	switch {
-	case errors.Is(err, usecase.ErrUserAlreadyExists):
+	case errors.Is(err, usecase.ErrUserAlreadyExists), errors.Is(err, usecase.ErrDataExists):
 		status = http.StatusBadRequest
 		errResp.Title = "Bind Error"
 		errResp.Detail = err.Error()

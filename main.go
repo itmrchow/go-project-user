@@ -17,6 +17,8 @@ import (
 // @tag.description User API
 // @tag.name Example
 // @tag.description Example API
+// @tag.name Wallet
+// @tag.description Wallet API
 // @tag.name Other
 // @tag.description Other description
 

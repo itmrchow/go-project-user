@@ -9,6 +9,8 @@ type UseCaseError error
 var (
 	ErrUserAlreadyExists = errors.New("user already exists")
 
+	ErrDataExists = errors.New("data already exists")
+
 	ErrUserNotExists = errors.New("user not exists")
 
 	ErrUnauthorized = errors.New("unauthorized")

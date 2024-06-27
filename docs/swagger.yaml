@@ -30,6 +30,21 @@ definitions:
     - phone
     - userName
     type: object
+  reqdto.CreateWalletReq:
+    properties:
+      balance:
+        example: 0
+        type: number
+      currency:
+        example: PHP
+        type: string
+      userId:
+        example: Jeff
+        type: string
+      walletType:
+        example: P
+        type: string
+    type: object
   reqdto.LoginReq:
     properties:
       account:
@@ -106,6 +121,54 @@ definitions:
       userName:
         type: string
     type: object
+  respdto.CreateWalletResp:
+    properties:
+      WalletType:
+        example: P
+        type: string
+      balance:
+        description: 餘額
+        example: 0
+        type: number
+      createdAt:
+        type: string
+      createdBy:
+        example: Jeff
+        type: string
+      currency:
+        description: 幣別
+        example: PHP
+        type: string
+      updatedAt:
+        type: string
+      updatedBy:
+        example: Jeff
+        type: string
+      userId:
+        example: Jeff
+        type: string
+    type: object
+  respdto.GetWalletResp:
+    properties:
+      WalletType:
+        type: string
+      balance:
+        description: 餘額
+        type: number
+      createdAt:
+        type: string
+      createdBy:
+        type: string
+      currency:
+        description: 幣別
+        type: string
+      updatedAt:
+        type: string
+      updatedBy:
+        type: string
+      userId:
+        type: string
+    type: object
   respdto.LoginResp:
     properties:
       exp:
@@ -121,6 +184,62 @@ info:
   title: User Service API
   version: "1.0"
 paths:
+  /Wallet/{userId}/{walletType}:
+    get:
+      parameters:
+      - description: User Id
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Wallet Type
+        in: path
+        name: walletType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回錢包訊息
+          schema:
+            $ref: '#/definitions/respdto.GetWalletResp'
+        default:
+          description: error response
+          schema:
+            $ref: '#/definitions/respdto.ApiErrorResp'
+      summary: 取得錢包
+      tags:
+      - Wallet
+  /Wallets:
+    get:
+      parameters:
+      - description: User Name
+        in: query
+        name: userName
+        type: string
+      - description: User Email
+        in: query
+        name: email
+        type: string
+      - description: User Phone
+        in: query
+        name: phone
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok" "返回用户信息
+          schema:
+            type: string
+        default:
+          description: error response
+          schema:
+            $ref: '#/definitions/respdto.ApiErrorResp'
+      summary: 查詢錢包
+      tags:
+      - Wallet
   /helloworld:
     get:
       consumes:
@@ -347,6 +466,29 @@ paths:
       summary: 查詢用戶
       tags:
       - User
+  /wallet:
+    post:
+      parameters:
+      - description: Create wallet sample
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/reqdto.CreateWalletReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回建立錢包訊息
+          schema:
+            $ref: '#/definitions/respdto.CreateWalletResp'
+        default:
+          description: error response
+          schema:
+            $ref: '#/definitions/respdto.ApiErrorResp'
+      summary: 建立錢包
+      tags:
+      - Wallet
 securityDefinitions:
   ApiKeyAuth:
     in: header
@@ -358,5 +500,7 @@ tags:
   name: User
 - description: Example API
   name: Example
+- description: Wallet API
+  name: Wallet
 - description: Other description
   name: Other

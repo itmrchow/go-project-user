@@ -23,6 +23,7 @@ var dbSet = wire.NewSet(
 
 var repoSet = wire.NewSet(
 	repo_impl.NewUserRepoImpl, wire.Bind(new(repo.UserRepo), new(*repo_impl.UserRepoImpl)),
+	repo_impl.NewWalletRepoImpl, wire.Bind(new(repo.WalletRepo), new(*repo_impl.WalletRepoImpl)),
 )
 
 var handlerSet = wire.NewSet(
@@ -32,6 +33,7 @@ var handlerSet = wire.NewSet(
 var usecaseSet = wire.NewSet(
 	usecase.NewCreateUserUseCase,
 	usecase.NewGetUserUseCase,
+	usecase.NewWalletUseCase,
 	usecase.NewPingServiceImpl, wire.Bind(new(usecase.PingService), new(*usecase.PingServiceImpl)),
 )
 
@@ -45,4 +47,11 @@ func InitPingController() (*controllers.PingController, error) {
 	wire.Build(dbSet, repoSet, usecaseSet, controllers.NewPingController)
 
 	return &controllers.PingController{}, nil
+}
+
+func InitWalletController() (*controllers.WalletController, error) {
+
+	wire.Build(dbSet, repoSet, usecaseSet, controllers.NewWalletController)
+
+	return &controllers.WalletController{}, nil
 }

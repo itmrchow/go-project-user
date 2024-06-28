@@ -20,8 +20,8 @@ func (u *UserRepoImpl) Create(user *domain.User) error {
 }
 
 func (u *UserRepoImpl) Get(userId string) (*domain.User, error) {
-	var user = domain.User{Id: userId}
-	result := u.handler.DB.First(&user)
+	var user = domain.User{}
+	result := u.handler.DB.First(&user, userId)
 
 	return &user, result.Error
 }
@@ -39,8 +39,8 @@ func (u *UserRepoImpl) ExistsByAccountOrEmailOrPhone(account string, email strin
 }
 
 func (u *UserRepoImpl) GetByAccountOrEmail(account string, email string) (*domain.User, error) {
-	var user = domain.User{Account: account, Email: email}
-	result := u.handler.DB.First(&user)
+	var user = domain.User{}
+	result := u.handler.DB.Where(domain.User{Account: account, Email: email}).First(&user)
 
 	return &user, result.Error
 }

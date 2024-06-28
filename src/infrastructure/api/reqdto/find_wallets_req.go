@@ -1,6 +1,6 @@
 package reqdto
 
 type FindWalletsReq struct {
-	WalletType string `form:"walletType" json:"walletType" binding:"required"`
-	Currency   string `form:"currency"   json:"currency"   binding:"required"`
+	WalletType string `form:"walletType" json:"walletType" `
+	Currency   string `form:"currency"   json:"currency"   `
 }

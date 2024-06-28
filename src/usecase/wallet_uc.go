@@ -85,7 +85,22 @@ type FindWalletOutput struct {
 
 func (u *WalletUseCase) FindWallet(input *FindWalletInput) (*[]FindWalletOutput, error) {
 
+	query := domain.Wallet{}
+	if err := copier.Copy(&query, &input); err != nil {
+		return nil, err
+	}
+
+	wallets, err := u.walletRepo.Find(query)
+
+	if err != nil {
+		return nil, errors.Join(ErrDbFail, err)
+	}
+
 	outSlice := []FindWalletOutput{}
+
+	if err := copier.Copy(&outSlice, &wallets); err != nil {
+		return nil, errors.Join(ErrDbFail, err)
+	}
 
 	return &outSlice, nil
 }

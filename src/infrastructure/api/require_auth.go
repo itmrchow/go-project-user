@@ -18,19 +18,20 @@ import (
 
 func RequireAuth(c *gin.Context) {
 
-	// get token
-	tokenStr := strings.Split(c.GetHeader("Authorization"), " ")[1]
-
-	if tokenStr == "" {
+	tokenInfo := strings.Split(c.GetHeader("Authorization"), " ")
+	if len(tokenInfo) != 2 {
 		c.AbortWithStatusJSON(
 			http.StatusUnauthorized,
 			respdto.ApiErrorResp{
 				Title:  "Unauthorized",
-				Detail: "No token",
+				Detail: "Invalid token format",
 			},
 		)
 		return
 	}
+
+	// get token
+	tokenStr := tokenInfo[1]
 
 	// parse token
 	token, parseErr := jwt.Parse(

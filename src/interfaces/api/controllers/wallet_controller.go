@@ -16,7 +16,7 @@ func NewWalletController(walletUC *usecase.WalletUseCase) *WalletController {
 	return &WalletController{walletUC: walletUC}
 }
 
-func (c *WalletController) CreateWallet(createWalletReq *reqdto.CreateWalletReq, authWallet *reqdto.AuthUser) (*respdto.CreateWalletResp, error) {
+func (c *WalletController) CreateWallet(createWalletReq *reqdto.CreateWalletReq, authUser *reqdto.AuthUser) (*respdto.CreateWalletResp, error) {
 
 	input := usecase.CreateWalletInput{}
 
@@ -24,7 +24,7 @@ func (c *WalletController) CreateWallet(createWalletReq *reqdto.CreateWalletReq,
 		return nil, err
 	}
 
-	out, err := c.walletUC.CreateWallet(&input, *authWallet)
+	out, err := c.walletUC.CreateWallet(&input, *authUser)
 
 	if err != nil {
 		return nil, err
@@ -37,4 +37,28 @@ func (c *WalletController) CreateWallet(createWalletReq *reqdto.CreateWalletReq,
 	}
 
 	return &resp, err
+}
+
+func (c *WalletController) FindWallets(req *reqdto.FindWalletsReq, authUser *reqdto.AuthUser) (*[]respdto.FindWalletResp, error) {
+
+	input := usecase.FindWalletInput{
+		UserId: authUser.Id,
+	}
+
+	if err := copier.Copy(&input, &req); err != nil {
+		return nil, err
+	}
+
+	out, err := c.walletUC.FindWallet(&input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	respSlice := []respdto.FindWalletResp{}
+	if err := copier.Copy(&respSlice, out); err != nil {
+		return nil, err
+	}
+
+	return &respSlice, nil
 }

@@ -24,6 +24,10 @@ func addWalletRoutes(rg *gin.RouterGroup) {
 		createWallet(c, walletController)
 	})
 
+	rg.GET("/wallets", func(c *gin.Context) {
+		findWallets(c, walletController)
+	})
+
 }
 
 // @Summary 取得錢包
@@ -33,24 +37,39 @@ func addWalletRoutes(rg *gin.RouterGroup) {
 // @Param walletType path string true "Wallet Type"
 // @Success 200 {object} respdto.GetWalletResp "返回錢包訊息"
 // @response default {object} respdto.ApiErrorResp "error response"
-// @Router /Wallet/{userId}/{walletType} [GET]
-func getWallet(c *gin.Context, controller *controllers.UserController) {
+// @Router /wallet/{userId}/{walletType} [GET]
+func getWallet(c *gin.Context, controller *controllers.WalletController) {
 	panic("unimplemented")
 }
 
 // @Summary 查詢錢包
+// @Description "查找User所屬的錢包"
 // @Produce json
 // @Tags Wallet
 // @Parameters.QueryParams
-// @Param userName query string false "User Name"
-// @Param email query string false "User Email"
-// @Param phone query string false "User Phone"
-// @Success 200 {string} string "ok" "返回用户信息"
+// @Param walletType query string false  "錢包類型" Enums(P)
+// @Param currency   query string false  "幣別"    Enums(PHP,USD,BTC,USDT)
+// @Success 200 {array} respdto.FindWalletResp "ok" "返回錢包查詢訊息"
 // @response default {object} respdto.ApiErrorResp "error response"
-// @Router /Wallets [GET]
-func findWallets(c *gin.Context, controller *controllers.UserController) {
+// @Router /wallets [GET]
+func findWallets(c *gin.Context, controller *controllers.WalletController) {
 
-	panic("unimplemented")
+	// context to dto
+	req := new(reqdto.FindWalletsReq) // bind bto
+	if err := c.BindQuery(&req); err != nil {
+		c.Error(err)
+		return
+	}
+
+	authUser := GetAuthUser(c)
+
+	resp, err := controller.FindWallets(req, authUser)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
 }
 
 // @Summary 建立錢包

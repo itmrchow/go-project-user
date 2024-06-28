@@ -65,5 +65,42 @@ func (u *WalletUseCase) CreateWallet(input *CreateWalletInput, authUser reqdto.A
 	}
 
 	return &out, nil
+}
 
+type FindWalletInput struct {
+	UserId     string
+	WalletType string
+	Currency   string
+}
+type FindWalletOutput struct {
+	UserId     string
+	WalletType string
+	Currency   string
+	Balance    float64
+	CreatedBy  string
+	UpdatedBy  string
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+}
+
+func (u *WalletUseCase) FindWallet(input *FindWalletInput) (*[]FindWalletOutput, error) {
+
+	query := domain.Wallet{}
+	if err := copier.Copy(&query, &input); err != nil {
+		return nil, err
+	}
+
+	wallets, err := u.walletRepo.Find(query)
+
+	if err != nil {
+		return nil, errors.Join(ErrDbFail, err)
+	}
+
+	outSlice := []FindWalletOutput{}
+
+	if err := copier.Copy(&outSlice, &wallets); err != nil {
+		return nil, errors.Join(ErrDbFail, err)
+	}
+
+	return &outSlice, nil
 }

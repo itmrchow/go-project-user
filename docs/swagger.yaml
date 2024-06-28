@@ -148,6 +148,27 @@ definitions:
         example: Jeff
         type: string
     type: object
+  respdto.FindWalletResp:
+    properties:
+      WalletType:
+        type: string
+      balance:
+        description: 餘額
+        type: number
+      createdAt:
+        type: string
+      createdBy:
+        type: string
+      currency:
+        description: 幣別
+        type: string
+      updatedAt:
+        type: string
+      updatedBy:
+        type: string
+      userId:
+        type: string
+    type: object
   respdto.GetWalletResp:
     properties:
       WalletType:
@@ -184,62 +205,6 @@ info:
   title: User Service API
   version: "1.0"
 paths:
-  /Wallet/{userId}/{walletType}:
-    get:
-      parameters:
-      - description: User Id
-        in: path
-        name: userId
-        required: true
-        type: string
-      - description: Wallet Type
-        in: path
-        name: walletType
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 返回錢包訊息
-          schema:
-            $ref: '#/definitions/respdto.GetWalletResp'
-        default:
-          description: error response
-          schema:
-            $ref: '#/definitions/respdto.ApiErrorResp'
-      summary: 取得錢包
-      tags:
-      - Wallet
-  /Wallets:
-    get:
-      parameters:
-      - description: User Name
-        in: query
-        name: userName
-        type: string
-      - description: User Email
-        in: query
-        name: email
-        type: string
-      - description: User Phone
-        in: query
-        name: phone
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok" "返回用户信息
-          schema:
-            type: string
-        default:
-          description: error response
-          schema:
-            $ref: '#/definitions/respdto.ApiErrorResp'
-      summary: 查詢錢包
-      tags:
-      - Wallet
   /helloworld:
     get:
       consumes:
@@ -487,6 +452,68 @@ paths:
           schema:
             $ref: '#/definitions/respdto.ApiErrorResp'
       summary: 建立錢包
+      tags:
+      - Wallet
+  /wallet/{userId}/{walletType}:
+    get:
+      parameters:
+      - description: User Id
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Wallet Type
+        in: path
+        name: walletType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回錢包訊息
+          schema:
+            $ref: '#/definitions/respdto.GetWalletResp'
+        default:
+          description: error response
+          schema:
+            $ref: '#/definitions/respdto.ApiErrorResp'
+      summary: 取得錢包
+      tags:
+      - Wallet
+  /wallets:
+    get:
+      description: '"查找User所屬的錢包"'
+      parameters:
+      - description: 錢包類型
+        enum:
+        - P
+        in: query
+        name: walletType
+        type: string
+      - description: 幣別
+        enum:
+        - PHP
+        - USD
+        - BTC
+        - USDT
+        in: query
+        name: currency
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok" "返回錢包查詢訊息
+          schema:
+            items:
+              $ref: '#/definitions/respdto.FindWalletResp'
+            type: array
+        default:
+          description: error response
+          schema:
+            $ref: '#/definitions/respdto.ApiErrorResp'
+      summary: 查詢錢包
       tags:
       - Wallet
 securityDefinitions:

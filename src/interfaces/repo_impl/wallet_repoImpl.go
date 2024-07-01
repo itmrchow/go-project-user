@@ -22,7 +22,7 @@ func (w *WalletRepoImpl) Create(wallet *domain.Wallet) error {
 	return w.handler.DB.Create(wallet).Error
 }
 
-func (w *WalletRepoImpl) Get(ctx *context.Context, walletId string) (*domain.Wallet, error) {
+func (w *WalletRepoImpl) Get(ctx context.Context, walletId string) (*domain.Wallet, error) {
 	// tx :=w.handler.DB.WithContext(ctx)
 
 	panic("TODO: Implement")
@@ -46,7 +46,3 @@ func (w *WalletRepoImpl) GetByUserIdAndWalletType(ctx context.Context, userId, w
 
 	return &wallet, result.Error
 }
-
-// func (w *WalletRepoImpl) GetByUserIdAndWalletType(userId string, walletType string) (*domain.Wallet, error) {
-// 	panic("TODO: Implement")
-// }

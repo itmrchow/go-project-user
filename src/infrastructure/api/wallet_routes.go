@@ -28,6 +28,10 @@ func addWalletRoutes(rg *gin.RouterGroup) {
 		findWallets(c, walletController)
 	})
 
+	rg.POST("/transferfunds", func(c *gin.Context) {
+		transferFunds(c, walletController)
+	})
+
 }
 
 // @Summary 取得錢包
@@ -98,4 +102,31 @@ func createWallet(c *gin.Context, controller *controllers.WalletController) {
 	}
 
 	c.JSON(http.StatusOK, response)
+}
+
+// @Summary 轉帳
+// @Produce json
+// @Tags Wallet
+// @Param body body reqdto.TransferFundsReq true "TransferFunds sample"
+// @Success 200 {string} success "返回成功"
+// @response default {object} respdto.ApiErrorResp "error response"
+// @Router /transferfunds [post]
+func transferFunds(ctx *gin.Context, controller *controllers.WalletController) {
+	// context to dto
+	transferFundsReq := new(reqdto.TransferFundsReq) // bind bto
+	if err := ctx.BindJSON(&transferFundsReq); err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	authUser := GetAuthUser(ctx)
+
+	// call controller
+	err := controller.TransferFunds(ctx, transferFundsReq, authUser)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "success")
 }

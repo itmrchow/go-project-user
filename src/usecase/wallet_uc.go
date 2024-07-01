@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
 
@@ -103,4 +104,24 @@ func (u *WalletUseCase) FindWallet(input *FindWalletInput) (*[]FindWalletOutput,
 	}
 
 	return &outSlice, nil
+}
+
+type TransferInput struct {
+	// 目標帳戶
+	// 轉帳帳戶
+	// 	Wallettype
+	// 金額
+
+}
+
+func (u *WalletUseCase) TransferFunds(c *gin.Context, input *FindWalletInput, authUser reqdto.AuthUser) error {
+	// 建立事務
+
+	// 查詢錢包存在
+	// 確認餘額
+	// 扣款 , 產生record
+	// 更新目標帳戶
+	// 產生record
+
+	return nil
 }

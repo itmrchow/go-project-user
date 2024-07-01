@@ -7,6 +7,7 @@ require github.com/go-playground/validator v9.31.0+incompatible
 require (
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/jinzhu/copier v0.4.0 // indirect
+	github.com/samber/lo v1.44.0 // indirect
 )
 
 require (

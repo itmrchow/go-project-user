@@ -1,6 +1,7 @@
 package repo_impl
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -85,5 +86,30 @@ func (s *WalletRepoImplTestSuite) TestWalletRepoImpl_Find() {
 		wallets, err := s.repoImpl.Find(query)
 
 		testcase.assertFunc(wallets, err)
+	})
+}
+
+func (s *WalletRepoImplTestSuite) TestWalletRepoImpl_GetByUserIdAndWalletType() {
+	s.T().Skip()
+
+	type test struct {
+		name       string
+		assertFunc func(wallet domain.Wallet, err error)
+	}
+
+	testcase := &test{
+		name: "Test GetByUserIdAndWalletType",
+		assertFunc: func(wallet domain.Wallet, err error) {
+			s.Assert().Equal("fa791816-dd35-42e6-a475-00f87d4ac9aa", wallet.UserId)
+			s.Assert().Equal("Combo1", wallet.WalletType)
+		},
+	}
+
+	s.Run(testcase.name, func() {
+		ctx := context.Background()
+
+		wallet, err := s.repoImpl.GetByUserIdAndWalletType(ctx, "fa791816-dd35-42e6-a475-00f87d4ac9aa", "Combo1")
+
+		testcase.assertFunc(*wallet, err)
 	})
 }

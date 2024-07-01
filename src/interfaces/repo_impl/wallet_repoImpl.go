@@ -1,6 +1,8 @@
 package repo_impl
 
 import (
+	"context"
+
 	"itmrchow/go-project/user/src/domain"
 	"itmrchow/go-project/user/src/infrastructure/database"
 )
@@ -16,10 +18,13 @@ func NewWalletRepoImpl(handler *database.MysqlHandler) *WalletRepoImpl {
 }
 
 func (w *WalletRepoImpl) Create(wallet *domain.Wallet) error {
+
 	return w.handler.DB.Create(wallet).Error
 }
 
-func (w *WalletRepoImpl) Get(walletId string) (*domain.Wallet, error) {
+func (w *WalletRepoImpl) Get(ctx *context.Context, walletId string) (*domain.Wallet, error) {
+	// tx :=w.handler.DB.WithContext(ctx)
+
 	panic("TODO: Implement")
 }
 
@@ -32,6 +37,14 @@ func (w *WalletRepoImpl) Find(query interface{}, args ...interface{}) ([]domain.
 		return nil, result.Error
 	}
 	return wallets, nil
+}
+
+func (w *WalletRepoImpl) GetByUserIdAndWalletType(ctx context.Context, userId, walletType string) (*domain.Wallet, error) {
+	var wallet = domain.Wallet{}
+	tx := w.handler.DB.WithContext(ctx)
+	result := tx.First(&wallet, "user_id = ? AND wallet_type = ?", userId, walletType)
+
+	return &wallet, result.Error
 }
 
 // func (w *WalletRepoImpl) GetByUserIdAndWalletType(userId string, walletType string) (*domain.Wallet, error) {

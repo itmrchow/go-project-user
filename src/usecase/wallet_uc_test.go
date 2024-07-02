@@ -20,14 +20,15 @@ func TestWalletSuite(t *testing.T) {
 
 type WalletTestSuite struct {
 	suite.Suite
-	usecase  *WalletUseCase
-	repoMock *repo.MockWalletRepo
-	authUser reqdto.AuthUser
+	usecase              *WalletUseCase
+	repoWalletMock       *repo.MockWalletRepo
+	repoWalletRecordMock *repo.MockWalletRecordRepo
+	authUser             reqdto.AuthUser
 }
 
 func (s *WalletTestSuite) SetupTest() {
-	s.repoMock = &repo.MockWalletRepo{}
-	s.usecase = NewWalletUseCase(s.repoMock)
+	s.repoWalletMock = &repo.MockWalletRepo{}
+	s.usecase = NewWalletUseCase(s.repoWalletMock, s.repoWalletRecordMock)
 }
 
 func (s *WalletTestSuite) Test_CreateWallet_WalletExist() {
@@ -52,7 +53,7 @@ func (s *WalletTestSuite) Test_CreateWallet_WalletExist() {
 			},
 		},
 		mockFunc: func() {
-			s.repoMock.On("Create", mock.Anything).Return(gorm.ErrDuplicatedKey)
+			s.repoWalletMock.On("Create", mock.Anything).Return(gorm.ErrDuplicatedKey).Once()
 		},
 		assertFunc: func(got *CreateWalletOutput, err error) {
 			s.Assert().Nil(got)
@@ -96,7 +97,7 @@ func (s *WalletTestSuite) Test_CreateWallet_Success() {
 		name: "wallet_success",
 		args: testArgs,
 		mockFunc: func() {
-			s.repoMock.On("Create", mock.Anything).Return(nil)
+			s.repoWalletMock.On("Create", mock.Anything).Return(nil).Once()
 		},
 		assertFunc: func(got *CreateWalletOutput, err error) {
 			s.Assert().Nil(err)
@@ -147,7 +148,7 @@ func (s *WalletTestSuite) Test_FindWallet() {
 				input: &FindWalletInput{},
 			},
 			mockFunc: func(args FindWalletArgs) {
-				s.repoMock.On(
+				s.repoWalletMock.On(
 					"Find",        //mock func name
 					mock.Anything, //mock args
 				).Return(nil, errors.New("some error")).Once()
@@ -161,13 +162,13 @@ func (s *WalletTestSuite) Test_FindWallet() {
 			name: "no_data",
 			args: FindWalletArgs{
 				input: &FindWalletInput{
-					UserId:     "Jeff",
+					UserId:     "Jeff_NoData",
 					WalletType: "P",
 					Currency:   "PHP",
 				},
 			},
 			mockFunc: func(args FindWalletArgs) {
-				s.repoMock.On(
+				s.repoWalletMock.On(
 					//mock func name
 					"Find",
 					//mock args
@@ -178,10 +179,10 @@ func (s *WalletTestSuite) Test_FindWallet() {
 							return false
 						}
 
-						// 確認值
-						isValueEq := s.Assert().Equal(args.input.UserId, query.UserId) &&
-							s.Assert().Equal(args.input.Currency, query.Currency) &&
-							s.Assert().Equal(args.input.WalletType, query.WalletType)
+						// return args.input.UserId == "Jeff_NoData"
+						isValueEq := args.input.UserId == query.UserId &&
+							args.input.Currency == query.Currency &&
+							args.input.WalletType == query.WalletType
 						return isValueEq
 					}),
 				).Return([]domain.Wallet{}, nil).Once()
@@ -195,13 +196,13 @@ func (s *WalletTestSuite) Test_FindWallet() {
 			name: "success",
 			args: FindWalletArgs{
 				input: &FindWalletInput{
-					UserId:     "Jeff",
+					UserId:     "Jeff_Success",
 					WalletType: "P",
 					Currency:   "PHP",
 				},
 			},
-			mockFunc: func(inputArgs FindWalletArgs) {
-				s.repoMock.On(
+			mockFunc: func(args FindWalletArgs) {
+				s.repoWalletMock.On(
 					//mock func name
 					"Find",
 					//mock args
@@ -213,26 +214,26 @@ func (s *WalletTestSuite) Test_FindWallet() {
 						}
 
 						// 確認值
-						isValueEq := s.Assert().Equal(inputArgs.input.UserId, query.UserId) &&
-							s.Assert().Equal(inputArgs.input.Currency, query.Currency) &&
-							s.Assert().Equal(inputArgs.input.WalletType, query.WalletType)
+						isValueEq := args.input.UserId == query.UserId &&
+							args.input.Currency == query.Currency &&
+							args.input.WalletType == query.WalletType
 						return isValueEq
 					}),
 				).Return([]domain.Wallet{
 					{
-						UserId:     "Jeff",
+						UserId:     "Jeff_Success",
 						WalletType: enum.WalletType.PLATFORM,
 						Currency:   enum.Currency.PHP,
 						Balance:    10.0,
 						DefaultModel: domain.DefaultModel{
-							CreatedBy: "Jeff",
-							UpdatedBy: "Jeff",
+							CreatedBy: "Jeff_Success",
+							UpdatedBy: "Jeff_Success",
 						},
 					},
 				}, nil).Once()
 			},
 			assertFunc: func(gotSlice *[]FindWalletOutput, err error, args FindWalletArgs) {
-				s.repoMock.AssertExpectations(s.T())
+				s.repoWalletMock.AssertExpectations(s.T())
 
 				s.Assert().Len(*gotSlice, 1)
 				s.Assert().Nil(err)
@@ -260,6 +261,7 @@ func (s *WalletTestSuite) Test_FindWallet() {
 			// assert
 			test.assertFunc(got, err, test.args)
 
+			s.repoWalletMock.AssertExpectations(s.T())
 		})
 	}
 }

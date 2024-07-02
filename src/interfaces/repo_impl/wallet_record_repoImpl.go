@@ -1,6 +1,8 @@
 package repo_impl
 
 import (
+	"log"
+
 	"gorm.io/gorm"
 
 	"itmrchow/go-project/user/src/domain"
@@ -30,8 +32,13 @@ func (w *WalletRecordRepoImpl) Get(id uint) (*domain.WalletRecord, error) {
 	return &walletRecord, result.Error
 }
 
-func (w *WalletRecordRepoImpl) WithTrx(p0 *gorm.DB) repo.WalletRecordRepo {
-	panic("TODO: Implement")
+func (w *WalletRecordRepoImpl) WithTrx(trxHandle *gorm.DB) repo.WalletRecordRepo {
+	if trxHandle == nil {
+		log.Print("Transaction Database not found")
+		return w
+	}
+	w.DB = trxHandle
+	return w
 }
 
 func (w *WalletRecordRepoImpl) Migrate() error {

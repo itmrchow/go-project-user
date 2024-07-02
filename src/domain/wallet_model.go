@@ -14,3 +14,15 @@ type Wallet struct {
 func (w Wallet) CheckDecrementAmount(amount float64) bool {
 	return w.Balance >= amount
 }
+
+func (w *Wallet) SetDeductBalance(amount float64) {
+	if !w.CheckDecrementAmount(amount) {
+		return
+	}
+
+	w.Balance = w.Balance - amount
+}
+
+func (w *Wallet) SetIncrementBalance(amount float64) {
+	w.Balance = w.Balance + amount
+}

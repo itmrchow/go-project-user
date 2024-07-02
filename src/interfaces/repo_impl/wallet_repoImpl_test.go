@@ -113,3 +113,33 @@ func (s *WalletRepoImplTestSuite) TestWalletRepoImpl_GetByUserIdAndWalletType() 
 		testcase.assertFunc(*wallet, err)
 	})
 }
+
+func (s *WalletRepoImplTestSuite) TestWalletRepoImpl_Update() {
+	s.T().Skip()
+
+	type test struct {
+		name       string
+		assertFunc func(updatedCount int64, err error)
+	}
+
+	testcase := &test{
+		name: "Test GetByUserIdAndWalletType",
+		assertFunc: func(updatedCount int64, err error) {
+			s.Assert().Equal(int64(1), updatedCount)
+			s.Assert().Nil(err)
+		},
+	}
+
+	s.Run(testcase.name, func() {
+		// ctx := context.Background()
+		// walletInfo, _ := s.repoImpl.Get(ctx, 12)
+
+		updateWallet := &domain.Wallet{}
+		updateWallet.Balance = 30
+		updateWallet.ID = 12
+
+		updatedCount, err := s.repoImpl.Update(updateWallet)
+
+		testcase.assertFunc(updatedCount, err)
+	})
+}

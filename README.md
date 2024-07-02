@@ -275,7 +275,11 @@ example
 ```
 copier.Copy(&userOut, &user)
 ```
+# 資料庫事務
+https://github.com/dipeshhkc/Golang-Gorm-MultiLayer-DB-Transaction?tab=readme-ov-file
 
+# lo
+https://github.com/samber/lo
 
 # Todo
 - [x] swagger

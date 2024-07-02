@@ -9,6 +9,8 @@ import (
 
 	"itmrchow/go-project/user/docs"
 	"itmrchow/go-project/user/src/infrastructure/api/reqdto"
+	"itmrchow/go-project/user/src/infrastructure/database"
+	"itmrchow/go-project/user/src/infrastructure/middleware"
 	"itmrchow/go-project/user/src/usecase"
 )
 
@@ -16,7 +18,9 @@ var router = gin.Default()
 
 func Run() {
 
-	router.Use(ErrorHandle())
+	dbHandler, _ := database.NewMySqlHandler()
+	router.Use(middleware.DBTransactionMiddleware(dbHandler.DB))
+	router.Use(middleware.ErrorHandle())
 
 	getRoutes()
 

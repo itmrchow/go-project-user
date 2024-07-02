@@ -97,6 +97,30 @@ definitions:
         example: Jeff
         type: string
     type: object
+  reqdto.TransferFundsReq:
+    properties:
+      amount:
+        example: 100
+        type: number
+      description:
+        example: Transfer Funds
+        type: string
+      fromWalletInfo:
+        $ref: '#/definitions/reqdto.WalletInfoReq'
+      toWalletInfo:
+        $ref: '#/definitions/reqdto.WalletInfoReq'
+    type: object
+  reqdto.WalletInfoReq:
+    properties:
+      account:
+        example: 1234567890
+        type: integer
+      userId:
+        example: "1234567890"
+        type: string
+      walletType:
+        type: string
+    type: object
   respdto.ApiErrorResp:
     properties:
       detail:
@@ -262,6 +286,29 @@ paths:
       summary: Ping Server
       tags:
       - Example
+  /transferfunds:
+    post:
+      parameters:
+      - description: TransferFunds sample
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/reqdto.TransferFundsReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回成功
+          schema:
+            type: string
+        default:
+          description: error response
+          schema:
+            $ref: '#/definitions/respdto.ApiErrorResp'
+      summary: 轉帳
+      tags:
+      - Wallet
   /user:
     post:
       parameters:

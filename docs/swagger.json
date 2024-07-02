@@ -95,6 +95,42 @@
                 }
             }
         },
+        "/transferfunds": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "轉帳",
+                "parameters": [
+                    {
+                        "description": "TransferFunds sample",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/reqdto.TransferFundsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回成功",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "default": {
+                        "description": "error response",
+                        "schema": {
+                            "$ref": "#/definitions/respdto.ApiErrorResp"
+                        }
+                    }
+                }
+            }
+        },
         "/user": {
             "post": {
                 "produces": [
@@ -614,6 +650,41 @@
                 "userName": {
                     "type": "string",
                     "example": "Jeff"
+                }
+            }
+        },
+        "reqdto.TransferFundsReq": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "example": 100
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Transfer Funds"
+                },
+                "fromWalletInfo": {
+                    "$ref": "#/definitions/reqdto.WalletInfoReq"
+                },
+                "toWalletInfo": {
+                    "$ref": "#/definitions/reqdto.WalletInfoReq"
+                }
+            }
+        },
+        "reqdto.WalletInfoReq": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "integer",
+                    "example": 1234567890
+                },
+                "userId": {
+                    "type": "string",
+                    "example": "1234567890"
+                },
+                "walletType": {
+                    "type": "string"
                 }
             }
         },

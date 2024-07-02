@@ -20,4 +20,6 @@ var (
 	ErrDbInsertFail = errors.New("db fail, insert key exist")
 
 	ErrPasswordHash = errors.New("password hash fail")
+
+	ErrPaymentRequired = errors.New("payment required")
 )

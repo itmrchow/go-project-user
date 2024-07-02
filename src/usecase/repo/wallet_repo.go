@@ -1,13 +1,20 @@
 //go:generate mockery --name WalletRepo
 package repo
 
-import "itmrchow/go-project/user/src/domain"
+import (
+	"context"
+
+	"gorm.io/gorm"
+
+	"itmrchow/go-project/user/src/domain"
+)
 
 type WalletRepo interface {
 	Create(wallet *domain.Wallet) error
-	Get(walletId string) (*domain.Wallet, error)
-
+	Get(ctx context.Context, walletId uint) (*domain.Wallet, error)
 	Find(query interface{}, args ...interface{}) ([]domain.Wallet, error)
-
-	// GetByUserIdAndWalletType(userId string, walletType string) (*domain.Wallet, error)
+	GetByUserIdAndWalletType(ctx context.Context, userId, walletType string) (*domain.Wallet, error)
+	Update(wallet *domain.Wallet) (int64, error)
+	WithTrx(*gorm.DB) WalletRepo
+	Migrate() error
 }

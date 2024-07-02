@@ -21,7 +21,8 @@ func (u *UserRepoImpl) Create(user *domain.User) error {
 
 func (u *UserRepoImpl) Get(userId string) (*domain.User, error) {
 	var user = domain.User{}
-	result := u.handler.DB.First(&user, userId)
+	user.Id = userId
+	result := u.handler.DB.First(&user)
 
 	return &user, result.Error
 }

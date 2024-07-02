@@ -9,7 +9,7 @@ import (
 
 type WalletRecordRepo interface {
 	Create(wallet *domain.WalletRecord) error
-	Get(id string) (*domain.WalletRecord, error)
+	Get(id uint) (*domain.WalletRecord, error)
 	WithTrx(*gorm.DB) WalletRecordRepo
 	Migrate() error
 }

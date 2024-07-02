@@ -6,6 +6,8 @@ type Wallet struct {
 	Currency   string  `json:"currency" gorm:"type:varbinary(10)"` // 幣別
 	Balance    float64 `json:"balance"`                            // 餘額
 
+	Records []WalletRecord `gorm:"foreignKey:WalletId;references:ID;"`
+
 	DefaultModel `gorm:"embedded"`
 }
 

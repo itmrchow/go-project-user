@@ -24,6 +24,7 @@ var dbSet = wire.NewSet(
 var repoSet = wire.NewSet(
 	repo_impl.NewUserRepoImpl, wire.Bind(new(repo.UserRepo), new(*repo_impl.UserRepoImpl)),
 	repo_impl.NewWalletRepoImpl, wire.Bind(new(repo.WalletRepo), new(*repo_impl.WalletRepoImpl)),
+	repo_impl.NewWalletRecordRepoImpl, wire.Bind(new(repo.WalletRecordRepo), new(*repo_impl.WalletRecordRepoImpl)),
 )
 
 var handlerSet = wire.NewSet(

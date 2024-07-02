@@ -81,6 +81,7 @@ func (m *MysqlHandler) Migrate() error {
 	return m.DB.AutoMigrate(
 		new(domain.User),
 		new(domain.Wallet),
+		new(domain.WalletRecord),
 	)
 }
 

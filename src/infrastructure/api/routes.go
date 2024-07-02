@@ -9,6 +9,7 @@ import (
 
 	"itmrchow/go-project/user/docs"
 	"itmrchow/go-project/user/src/infrastructure/api/reqdto"
+	"itmrchow/go-project/user/src/infrastructure/middleware"
 	"itmrchow/go-project/user/src/usecase"
 )
 
@@ -16,7 +17,7 @@ var router = gin.Default()
 
 func Run() {
 
-	router.Use(ErrorHandle())
+	router.Use(middleware.ErrorHandle())
 
 	getRoutes()
 

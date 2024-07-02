@@ -7,6 +7,7 @@ import (
 
 	"itmrchow/go-project/user/config"
 	"itmrchow/go-project/user/src/infrastructure/api/reqdto"
+	"itmrchow/go-project/user/src/infrastructure/middleware"
 	"itmrchow/go-project/user/src/interfaces/api/controllers"
 )
 
@@ -22,7 +23,7 @@ func addUserRoutes(rg *gin.RouterGroup) {
 		loginUser(c, userController)
 	})
 
-	rg.Use(RequireAuth)
+	rg.Use(middleware.RequireAuth)
 
 	// user API
 	rg.GET("/user/:userId", func(c *gin.Context) {

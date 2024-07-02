@@ -7,7 +7,6 @@ import (
 
 	"itmrchow/go-project/user/config"
 	"itmrchow/go-project/user/src/infrastructure/api/reqdto"
-	"itmrchow/go-project/user/src/infrastructure/database"
 	"itmrchow/go-project/user/src/infrastructure/middleware"
 	"itmrchow/go-project/user/src/interfaces/api/controllers"
 )
@@ -20,10 +19,7 @@ func addWalletRoutes(rg *gin.RouterGroup) {
 		panic(err)
 	}
 
-	dbHandler, _ := database.NewMySqlHandler()
-
 	rg.Use(middleware.RequireAuth)
-	rg.Use(middleware.DBTransactionMiddleware(dbHandler.DB))
 
 	rg.POST("/wallet", func(c *gin.Context) {
 		createWallet(c, walletController)

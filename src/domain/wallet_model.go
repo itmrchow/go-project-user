@@ -8,3 +8,7 @@ type Wallet struct {
 
 	DefaultModel `gorm:"embedded"`
 }
+
+func (w Wallet) CheckDecrementAmount(amount float64) bool {
+	return w.Balance >= amount
+}

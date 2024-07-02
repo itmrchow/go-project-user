@@ -8,7 +8,7 @@ type TransferFundsReq struct {
 }
 
 type WalletInfoReq struct {
-	Id         string `json:"account" example:"1234567890"`
+	Id         uint   `json:"account" example:"1234567890"`
+	UserId     string `json:"userId" example:"1234567890"`
 	WalletType string `form:"walletType" json:"walletType" `
-	Currency   string `form:"currency"   json:"currency"   `
 }

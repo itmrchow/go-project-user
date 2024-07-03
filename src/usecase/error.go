@@ -22,4 +22,6 @@ var (
 	ErrPasswordHash = errors.New("password hash fail")
 
 	ErrPaymentRequired = errors.New("payment required")
+
+	ErrTimeOut = errors.New("deadline exceeded")
 )

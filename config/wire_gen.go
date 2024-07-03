@@ -8,7 +8,6 @@ package config
 
 import (
 	"github.com/google/wire"
-
 	"itmrchow/go-project/user/src/infrastructure/database"
 	"itmrchow/go-project/user/src/interfaces/api/controllers"
 	"itmrchow/go-project/user/src/interfaces/handlerimpl"

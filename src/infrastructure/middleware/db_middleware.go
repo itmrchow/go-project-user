@@ -1,8 +1,10 @@
 package middleware
 
 import (
+	"context"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/samber/lo"
@@ -34,5 +36,13 @@ func DBTransactionMiddleware(db *gorm.DB) gin.HandlerFunc {
 			txHandle.Rollback()
 		}
 
+	}
+}
+
+func SetDBMiddleware(db *gorm.DB) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		timeoutContext, _ := context.WithTimeout(ctx, time.Second)
+		db = db.WithContext(timeoutContext)
+		ctx.Set("DB", db)
 	}
 }

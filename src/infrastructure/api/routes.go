@@ -20,6 +20,7 @@ func Run() {
 
 	dbHandler, _ := database.NewMySqlHandler()
 	router.Use(middleware.DBTransactionMiddleware(dbHandler.DB))
+	router.Use(middleware.SetDBMiddleware(dbHandler.DB))
 	router.Use(middleware.ErrorHandle())
 
 	getRoutes()

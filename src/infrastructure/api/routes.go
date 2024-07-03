@@ -19,7 +19,8 @@ var router = gin.Default()
 func Run() {
 
 	dbHandler, _ := database.NewMySqlHandler()
-	router.Use(middleware.DBTransactionMiddleware(dbHandler.DB))
+
+	// router.Use(middleware.DBTransactionMiddleware(dbHandler.DB)) // transaction中間件
 	router.Use(middleware.SetDBMiddleware(dbHandler.DB))
 	router.Use(middleware.ErrorHandle())
 
@@ -47,12 +48,8 @@ func getRoutes() {
 }
 
 func GetAuthUser(c *gin.Context) *reqdto.AuthUser {
-	authUserInfo, isExists := c.Get("AuthUser")
-	if !isExists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": usecase.ErrUnauthorized})
-	}
+	authUser, ok := c.MustGet("AuthUser").(reqdto.AuthUser)
 
-	authUser, ok := authUserInfo.(reqdto.AuthUser)
 	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": usecase.ErrUnauthorized})
 	}

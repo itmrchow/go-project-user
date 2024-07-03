@@ -33,13 +33,20 @@ func (w *WalletRecordRepoImpl) Get(ctx *gin.Context, id uint) (*domain.WalletRec
 	return &walletRecord, result.Error
 }
 
+func (w *WalletRecordRepoImpl) Update(ctx *gin.Context, record *domain.WalletRecord) (int64, error) {
+	result := w.DB.Model(&domain.WalletRecord{}).Where("id = ?", record.ID).Updates(record)
+	return result.RowsAffected, result.Error
+}
+
 func (w *WalletRecordRepoImpl) WithTrx(trxHandle *gorm.DB) repo.WalletRecordRepo {
 	if trxHandle == nil {
 		log.Print("Transaction Database not found")
 		return w
 	}
-	w.DB = trxHandle
-	return w
+
+	return &WalletRecordRepoImpl{
+		DB: trxHandle,
+	}
 }
 
 func (w *WalletRecordRepoImpl) Migrate() error {

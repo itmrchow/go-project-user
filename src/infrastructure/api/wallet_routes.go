@@ -33,6 +33,8 @@ func addWalletRoutes(rg *gin.RouterGroup) {
 		transferFunds(c, walletController)
 	})
 
+	rg.POST("/deduction", walletController.Deduction)
+
 }
 
 // @Summary 取得錢包

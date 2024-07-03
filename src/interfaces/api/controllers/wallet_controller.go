@@ -86,3 +86,17 @@ func (c *WalletController) TransferFunds(ctx *gin.Context, req *reqdto.TransferF
 
 	return nil
 }
+
+// @Summary 扣款
+// @Produce json
+// @Tags Wallet
+// @Param body body reqdto.TransferFundsReq true "TransferFunds sample"
+// @Success 200 {string} success "返回成功"
+// @response default {object} respdto.ApiErrorResp "error response"
+// @Router /deduction [post]
+func (c *WalletController) Deduction(ctx *gin.Context) {
+	// 1. get req
+	// 2. call use case
+	// - c.walletUC.DecrementMoney()
+	// 3. return response
+}

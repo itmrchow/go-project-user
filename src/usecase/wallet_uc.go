@@ -132,7 +132,7 @@ type GetWalletOut struct {
 	UpdatedAt  time.Time
 }
 
-func (u *WalletUseCase) GetWallet(ctx *gin.Context, input *GetWalletInput) (*domain.Wallet, error) {
+func (u *WalletUseCase) GetWallet(ctx *gin.Context, input *GetWalletInput) (*GetWalletOut, error) {
 
 	var wallet *domain.Wallet
 	var err error
@@ -149,7 +149,12 @@ func (u *WalletUseCase) GetWallet(ctx *gin.Context, input *GetWalletInput) (*dom
 		return nil, errors.Join(ErrDbFail, err)
 	}
 
-	return wallet, nil
+	out := &GetWalletOut{}
+	if err := copier.Copy(out, wallet); err != nil {
+		return nil, err
+	}
+
+	return out, nil
 }
 
 type TransferFundsInput struct {

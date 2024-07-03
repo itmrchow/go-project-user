@@ -45,6 +45,21 @@ definitions:
         example: P
         type: string
     type: object
+  reqdto.DeductionReq:
+    properties:
+      amount:
+        example: 50
+        type: number
+      description:
+        example: 幫你扣個錢
+        type: string
+      eventName:
+        example: Deduction
+        type: string
+      walletId:
+        example: 12
+        type: integer
+    type: object
   reqdto.LoginReq:
     properties:
       account:
@@ -229,6 +244,29 @@ info:
   title: User Service API
   version: "1.0"
 paths:
+  /deduction:
+    post:
+      parameters:
+      - description: TransferFunds sample
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/reqdto.DeductionReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回成功
+          schema:
+            type: string
+        default:
+          description: error response
+          schema:
+            $ref: '#/definitions/respdto.ApiErrorResp'
+      summary: 扣款
+      tags:
+      - Wallet
   /helloworld:
     get:
       consumes:

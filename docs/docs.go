@@ -15,6 +15,42 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/deduction": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "扣款",
+                "parameters": [
+                    {
+                        "description": "TransferFunds sample",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/reqdto.DeductionReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回成功",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "default": {
+                        "description": "error response",
+                        "schema": {
+                            "$ref": "#/definitions/respdto.ApiErrorResp"
+                        }
+                    }
+                }
+            }
+        },
         "/helloworld": {
             "get": {
                 "description": "do ping",
@@ -586,6 +622,27 @@ const docTemplate = `{
                 "walletType": {
                     "type": "string",
                     "example": "P"
+                }
+            }
+        },
+        "reqdto.DeductionReq": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "example": 50
+                },
+                "description": {
+                    "type": "string",
+                    "example": "幫你扣個錢"
+                },
+                "eventName": {
+                    "type": "string",
+                    "example": "Deduction"
+                },
+                "walletId": {
+                    "type": "integer",
+                    "example": 12
                 }
             }
         },

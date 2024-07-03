@@ -65,10 +65,17 @@ func setErrResp(err error) (status int, errResp respdto.ApiErrorResp) {
 		status = http.StatusUnauthorized
 		errResp.Title = "Unauthorized"
 		errResp.Detail = err.Error()
+
 	case errors.Is(err, usecase.ErrPaymentRequired):
 		status = http.StatusPaymentRequired
 		errResp.Title = "Payment Required"
 		errResp.Detail = err.Error()
+
+	case errors.Is(err, usecase.ErrTimeOut):
+		status = http.StatusGatewayTimeout
+		errResp.Title = "Time Out"
+		errResp.Detail = err.Error()
+
 	default:
 		status = http.StatusInternalServerError
 		errResp.Title = "Other Error"

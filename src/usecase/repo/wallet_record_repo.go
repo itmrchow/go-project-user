@@ -9,8 +9,9 @@ import (
 )
 
 type WalletRecordRepo interface {
-	Create(ctx *gin.Context, wallet *domain.WalletRecord) error
+	Create(ctx *gin.Context, record *domain.WalletRecord) error
 	Get(ctx *gin.Context, id uint) (*domain.WalletRecord, error)
+	Update(ctx *gin.Context, record *domain.WalletRecord) (int64, error)
 	WithTrx(*gorm.DB) WalletRecordRepo
 	Migrate() error
 }

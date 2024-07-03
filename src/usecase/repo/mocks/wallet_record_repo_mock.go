@@ -27,9 +27,9 @@ func (_m *MockWalletRecordRepo) EXPECT() *MockWalletRecordRepo_Expecter {
 	return &MockWalletRecordRepo_Expecter{mock: &_m.Mock}
 }
 
-// Create provides a mock function with given fields: ctx, wallet
-func (_m *MockWalletRecordRepo) Create(ctx *gin.Context, wallet *domain.WalletRecord) error {
-	ret := _m.Called(ctx, wallet)
+// Create provides a mock function with given fields: ctx, record
+func (_m *MockWalletRecordRepo) Create(ctx *gin.Context, record *domain.WalletRecord) error {
+	ret := _m.Called(ctx, record)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
@@ -37,7 +37,7 @@ func (_m *MockWalletRecordRepo) Create(ctx *gin.Context, wallet *domain.WalletRe
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(*gin.Context, *domain.WalletRecord) error); ok {
-		r0 = rf(ctx, wallet)
+		r0 = rf(ctx, record)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -52,12 +52,12 @@ type MockWalletRecordRepo_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - ctx *gin.Context
-//   - wallet *domain.WalletRecord
-func (_e *MockWalletRecordRepo_Expecter) Create(ctx interface{}, wallet interface{}) *MockWalletRecordRepo_Create_Call {
-	return &MockWalletRecordRepo_Create_Call{Call: _e.mock.On("Create", ctx, wallet)}
+//   - record *domain.WalletRecord
+func (_e *MockWalletRecordRepo_Expecter) Create(ctx interface{}, record interface{}) *MockWalletRecordRepo_Create_Call {
+	return &MockWalletRecordRepo_Create_Call{Call: _e.mock.On("Create", ctx, record)}
 }
 
-func (_c *MockWalletRecordRepo_Create_Call) Run(run func(ctx *gin.Context, wallet *domain.WalletRecord)) *MockWalletRecordRepo_Create_Call {
+func (_c *MockWalletRecordRepo_Create_Call) Run(run func(ctx *gin.Context, record *domain.WalletRecord)) *MockWalletRecordRepo_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(*gin.Context), args[1].(*domain.WalletRecord))
 	})
@@ -174,6 +174,63 @@ func (_c *MockWalletRecordRepo_Migrate_Call) Return(_a0 error) *MockWalletRecord
 }
 
 func (_c *MockWalletRecordRepo_Migrate_Call) RunAndReturn(run func() error) *MockWalletRecordRepo_Migrate_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Update provides a mock function with given fields: ctx, record
+func (_m *MockWalletRecordRepo) Update(ctx *gin.Context, record *domain.WalletRecord) (int64, error) {
+	ret := _m.Called(ctx, record)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Update")
+	}
+
+	var r0 int64
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*gin.Context, *domain.WalletRecord) (int64, error)); ok {
+		return rf(ctx, record)
+	}
+	if rf, ok := ret.Get(0).(func(*gin.Context, *domain.WalletRecord) int64); ok {
+		r0 = rf(ctx, record)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	if rf, ok := ret.Get(1).(func(*gin.Context, *domain.WalletRecord) error); ok {
+		r1 = rf(ctx, record)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockWalletRecordRepo_Update_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Update'
+type MockWalletRecordRepo_Update_Call struct {
+	*mock.Call
+}
+
+// Update is a helper method to define mock.On call
+//   - ctx *gin.Context
+//   - record *domain.WalletRecord
+func (_e *MockWalletRecordRepo_Expecter) Update(ctx interface{}, record interface{}) *MockWalletRecordRepo_Update_Call {
+	return &MockWalletRecordRepo_Update_Call{Call: _e.mock.On("Update", ctx, record)}
+}
+
+func (_c *MockWalletRecordRepo_Update_Call) Run(run func(ctx *gin.Context, record *domain.WalletRecord)) *MockWalletRecordRepo_Update_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*gin.Context), args[1].(*domain.WalletRecord))
+	})
+	return _c
+}
+
+func (_c *MockWalletRecordRepo_Update_Call) Return(_a0 int64, _a1 error) *MockWalletRecordRepo_Update_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockWalletRecordRepo_Update_Call) RunAndReturn(run func(*gin.Context, *domain.WalletRecord) (int64, error)) *MockWalletRecordRepo_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }

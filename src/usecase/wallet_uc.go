@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -175,7 +176,7 @@ func (u *WalletUseCase) TransferFunds(ctx *gin.Context, input *TransferFundsInpu
 	toInfo := input.ToWalletInfo
 	fromInfo := input.FromWalletInfo
 	// 扣款
-	if err := u.DecrementMoney(ctx, fromInfo.Id, fromInfo.UserId, fromInfo.WalletType, input.Amount, "轉帳扣款", input.Description, authUser); err != nil {
+	if err := u.DecrementMoney(ctx, fromInfo.Id, input.Amount, "轉帳扣款", input.Description, authUser.Id); err != nil {
 		return err
 	}
 
@@ -188,18 +189,9 @@ func (u *WalletUseCase) TransferFunds(ctx *gin.Context, input *TransferFundsInpu
 }
 
 // DecrementMoney
-func (u *WalletUseCase) DecrementMoney(ctx *gin.Context, walletId uint, userId string, walletType string, amount float64, eventName string, depiction string, authUser reqdto.AuthUser) error {
+func (u *WalletUseCase) DecrementMoney(ctx *gin.Context, walletId uint, amount float64, eventName string, depiction string, updateUserId string) error {
 	// get wallet
-	var wallet *domain.Wallet
-	var err error
-
-	if walletId == 0 {
-		// get by UserId & Wallet Type
-		wallet, err = u.walletRepo.GetByUserIdAndWalletType(ctx, userId, walletType)
-	} else {
-		// get by id
-		wallet, err = u.walletRepo.Get(ctx, walletId)
-	}
+	wallet, err := u.walletRepo.Get(ctx, walletId)
 	if err != nil {
 		return errors.Join(ErrDbFail, err)
 	}
@@ -210,10 +202,10 @@ func (u *WalletUseCase) DecrementMoney(ctx *gin.Context, walletId uint, userId s
 	}
 
 	// create wallet record
-	walletRecord := domain.WalletRecord{
+	walletRecord := &domain.WalletRecord{
 		DefaultModel: domain.DefaultModel{
-			CreatedBy: authUser.Id,
-			UpdatedBy: authUser.Id,
+			CreatedBy: updateUserId,
+			UpdatedBy: updateUserId,
 		},
 		WalletId:    wallet.ID,
 		RecordName:  eventName,
@@ -223,22 +215,50 @@ func (u *WalletUseCase) DecrementMoney(ctx *gin.Context, walletId uint, userId s
 		Description: depiction,
 	}
 
-	if err := u.walletRecordRepo.Create(ctx, &walletRecord); err != nil {
+	if err := u.walletRecordRepo.Create(ctx, walletRecord); err != nil {
 		return errors.Join(ErrDbFail, err)
 	}
 
-	// update balance
-	wallet.SetDeductBalance(amount)
-	wallet.DefaultModel.UpdatedBy = authUser.Id
+	db := ctx.MustGet("DB").(*gorm.DB)
 
-	if updatedCount, err := u.walletRepo.Update(wallet); err != nil || updatedCount == 0 {
+	if err := db.Transaction(func(tx *gorm.DB) error {
+		trxWalletRepo := u.walletRepo.WithTrx(tx)
+		trxWalletRecordRepo := u.walletRecordRepo.WithTrx(tx)
+
+		// update wallet balance
+		wallet.SetDeductBalance(amount)
+		wallet.UpdatedBy = updateUserId
+
+		if updatedCount, err := trxWalletRepo.Update(wallet); err != nil || updatedCount == 0 {
+			if err != nil {
+				return errors.Join(ErrDbFail, err)
+			} else {
+				return errors.Join(ErrDbFail, errors.New("update fail"))
+			}
+		}
+
+		// update reocrd
+		updateWalletRecord, err := trxWalletRecordRepo.Get(ctx, walletRecord.ID)
 		if err != nil {
+			return errors.Join(ErrDataExists, err)
+		}
+
+		updateWalletRecord.WalletBalance = wallet.Balance
+		updateWalletRecord.Status = domain.WALLETRECORDSTATUS_SUCCESS
+		updateWalletRecord.UpdatedBy = updateUserId
+
+		if updatedCount, err := trxWalletRecordRepo.Update(ctx, updateWalletRecord); err != nil || updatedCount == 0 {
 			return errors.Join(ErrDbFail, err)
+		}
+
+		return nil
+	}); err != nil {
+		if errors.Is(err, context.DeadlineExceeded) {
+			return errors.Join(ErrTimeOut, err)
 		} else {
-			return errors.Join(ErrDbFail, errors.New("update fail"))
+			return err
 		}
 	}
-
 	return nil
 }
 
@@ -277,17 +297,39 @@ func (u *WalletUseCase) IncrementMoney(ctx *gin.Context, walletId uint, userId s
 		return errors.Join(ErrDbFail, err)
 	}
 
-	// update balance
-	wallet.SetDeductBalance(amount)
-	wallet.DefaultModel.UpdatedBy = authUser.Id
+	db := ctx.MustGet("DB").(*gorm.DB)
 
-	if updatedCount, err := u.walletRepo.Update(wallet); err != nil || updatedCount == 0 {
+	return db.Transaction(func(tx *gorm.DB) error {
+		trxWalletRepo := u.walletRepo.WithTrx(tx)
+		trxWalletRecordRepo := u.walletRecordRepo.WithTrx(tx)
+
+		// update wallet balance
+		wallet.SetDeductBalance(amount)
+		wallet.UpdatedBy = authUser.Id
+
+		if updatedCount, err := trxWalletRepo.Update(wallet); err != nil || updatedCount == 0 {
+			if err != nil {
+				return errors.Join(ErrDbFail, err)
+			} else {
+				return errors.Join(ErrDbFail, errors.New("update fail"))
+			}
+		}
+
+		// update reocrd
+		updateWalletRecord, err := trxWalletRecordRepo.Get(ctx, walletId)
 		if err != nil {
 			return errors.Join(ErrDbFail, err)
-		} else {
-			return errors.Join(ErrDbFail, errors.New("update fail"))
 		}
-	}
 
-	return nil
+		updateWalletRecord.WalletBalance = wallet.Balance
+		updateWalletRecord.Status = domain.WALLETRECORDSTATUS_SUCCESS
+		updateWalletRecord.UpdatedBy = authUser.Id
+
+		if updatedCount, err := trxWalletRecordRepo.Update(ctx, updateWalletRecord); err != nil || updatedCount == 0 {
+			return errors.Join(ErrDbFail, err)
+		}
+
+		return nil
+	})
+
 }

@@ -98,14 +98,28 @@ func (c *WalletController) TransferFunds(ctx *gin.Context, req *reqdto.TransferF
 func (c *WalletController) Deduction(ctx *gin.Context) {
 
 	req := &reqdto.DeductionReq{}
-	if err := ctx.BindQuery(&req); err != nil {
+	if err := ctx.BindJSON(req); err != nil {
 		ctx.Error(err)
 		return
 	}
 
-	// 2. call use case
-	// c.walletUC.DecrementMoney(ctx, walletId)
+	authUser := GetAuthUser(ctx)
+
+	if err := c.walletUC.DecrementMoney(ctx, req.WalletId, req.Amount, req.EventName, req.Description, authUser.Id); err != nil {
+		ctx.Error(err)
+		return
+	}
 
 	// 3. return response
 	ctx.JSON(http.StatusOK, "success")
+}
+
+func GetAuthUser(ctx *gin.Context) *reqdto.AuthUser {
+	authUser, ok := ctx.MustGet("AuthUser").(reqdto.AuthUser)
+
+	if !ok {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": usecase.ErrUnauthorized})
+	}
+
+	return &authUser
 }

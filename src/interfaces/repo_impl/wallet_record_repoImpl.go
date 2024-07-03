@@ -3,6 +3,7 @@ package repo_impl
 import (
 	"log"
 
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
 	"itmrchow/go-project/user/src/domain"
@@ -20,15 +21,15 @@ func NewWalletRecordRepoImpl(handler *database.MysqlHandler) *WalletRecordRepoIm
 	}
 }
 
-func (w *WalletRecordRepoImpl) Create(wallet *domain.WalletRecord) error {
-	return w.DB.Create(wallet).Error
+func (w *WalletRecordRepoImpl) Create(ctx *gin.Context, wallet *domain.WalletRecord) error {
+	return w.DB.WithContext(ctx).Create(wallet).Error
 }
 
-func (w *WalletRecordRepoImpl) Get(id uint) (*domain.WalletRecord, error) {
+func (w *WalletRecordRepoImpl) Get(ctx *gin.Context, id uint) (*domain.WalletRecord, error) {
 	var walletRecord = domain.WalletRecord{}
 	walletRecord.ID = id
 
-	result := w.DB.Preload("Wallet").First(&walletRecord)
+	result := w.DB.WithContext(ctx).Preload("Wallet").First(&walletRecord)
 	return &walletRecord, result.Error
 }
 

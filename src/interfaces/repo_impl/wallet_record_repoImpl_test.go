@@ -1,8 +1,10 @@
 package repo_impl
 
 import (
+	"net/http/httptest"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 
 	"itmrchow/go-project/user/src/domain"
@@ -17,6 +19,7 @@ func TestWalletRecordRepoImplSuite(t *testing.T) {
 type WalletRecordRepoImplTestSuite struct {
 	suite.Suite
 	repoImpl *WalletRecordRepoImpl
+	ctx      *gin.Context
 }
 
 func (s *WalletRecordRepoImplTestSuite) SetupTest() {
@@ -24,6 +27,11 @@ func (s *WalletRecordRepoImplTestSuite) SetupTest() {
 
 	handler, _ := database.NewMySqlHandler()
 	s.repoImpl = NewWalletRecordRepoImpl(handler)
+
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+
+	s.ctx = ctx
 }
 
 func (s *WalletRecordRepoImplTestSuite) TestWalletRecordRepoImpl_Create() {
@@ -38,7 +46,7 @@ func (s *WalletRecordRepoImplTestSuite) TestWalletRecordRepoImpl_Create() {
 		Description: "Description test",
 	}
 
-	err := s.repoImpl.Create(&record)
+	err := s.repoImpl.Create(s.ctx, &record)
 
 	s.Assert().Nil(err)
 
@@ -47,7 +55,7 @@ func (s *WalletRecordRepoImplTestSuite) TestWalletRecordRepoImpl_Create() {
 func (s *WalletRecordRepoImplTestSuite) TestWalletRecordRepoImpl_Get() {
 	s.T().Skip()
 
-	record, _ := s.repoImpl.Get(1)
+	record, _ := s.repoImpl.Get(s.ctx, 3)
 
 	s.Assert().Equal(uint(1), record.ID)
 	s.Assert().Equal(uint(12), record.WalletId)

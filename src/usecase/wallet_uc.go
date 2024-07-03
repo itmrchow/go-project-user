@@ -170,7 +170,7 @@ func (u *WalletUseCase) TransferFunds(ctx *gin.Context, input *TransferFundsInpu
 	toInfo := input.ToWalletInfo
 	fromInfo := input.FromWalletInfo
 	// 扣款
-	if err := u.DecrementMoney(ctx, fromInfo.Id, fromInfo.UserId, fromInfo.WalletType, input.Amount, authUser); err != nil {
+	if err := u.DecrementMoney(ctx, fromInfo.Id, fromInfo.UserId, fromInfo.WalletType, input.Amount, "轉帳扣款", input.Description, authUser); err != nil {
 		return err
 	}
 
@@ -183,7 +183,7 @@ func (u *WalletUseCase) TransferFunds(ctx *gin.Context, input *TransferFundsInpu
 }
 
 // DecrementMoney
-func (u *WalletUseCase) DecrementMoney(ctx *gin.Context, walletId uint, userId string, walletType string, amount float64, authUser reqdto.AuthUser) error {
+func (u *WalletUseCase) DecrementMoney(ctx *gin.Context, walletId uint, userId string, walletType string, amount float64, eventName string, depiction string, authUser reqdto.AuthUser) error {
 	// get wallet
 	var wallet *domain.Wallet
 	var err error
@@ -211,14 +211,14 @@ func (u *WalletUseCase) DecrementMoney(ctx *gin.Context, walletId uint, userId s
 			UpdatedBy: authUser.Id,
 		},
 		WalletId:    wallet.ID,
-		RecordName:  "Decrement Money",
+		RecordName:  eventName,
 		Currency:    wallet.Currency,
 		Amount:      amount * -1,
 		Status:      domain.WALLETRECORDSTATUS_PENDING,
-		Description: fmt.Sprintf("Decrement Money:%f", amount),
+		Description: depiction,
 	}
 
-	if err := u.walletRecordRepo.Create(&walletRecord); err != nil {
+	if err := u.walletRecordRepo.Create(ctx, &walletRecord); err != nil {
 		return errors.Join(ErrDbFail, err)
 	}
 
@@ -268,7 +268,7 @@ func (u *WalletUseCase) IncrementMoney(ctx *gin.Context, walletId uint, userId s
 		Description: fmt.Sprintf("Increment Money:%f", amount),
 	}
 
-	if err := u.walletRecordRepo.Create(&walletRecord); err != nil {
+	if err := u.walletRecordRepo.Create(ctx, &walletRecord); err != nil {
 		return errors.Join(ErrDbFail, err)
 	}
 

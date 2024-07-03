@@ -5,6 +5,8 @@ package repo
 import (
 	domain "itmrchow/go-project/user/src/domain"
 
+	gin "github.com/gin-gonic/gin"
+
 	gorm "gorm.io/gorm"
 
 	mock "github.com/stretchr/testify/mock"
@@ -25,17 +27,17 @@ func (_m *MockWalletRecordRepo) EXPECT() *MockWalletRecordRepo_Expecter {
 	return &MockWalletRecordRepo_Expecter{mock: &_m.Mock}
 }
 
-// Create provides a mock function with given fields: wallet
-func (_m *MockWalletRecordRepo) Create(wallet *domain.WalletRecord) error {
-	ret := _m.Called(wallet)
+// Create provides a mock function with given fields: ctx, wallet
+func (_m *MockWalletRecordRepo) Create(ctx *gin.Context, wallet *domain.WalletRecord) error {
+	ret := _m.Called(ctx, wallet)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*domain.WalletRecord) error); ok {
-		r0 = rf(wallet)
+	if rf, ok := ret.Get(0).(func(*gin.Context, *domain.WalletRecord) error); ok {
+		r0 = rf(ctx, wallet)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -49,14 +51,15 @@ type MockWalletRecordRepo_Create_Call struct {
 }
 
 // Create is a helper method to define mock.On call
+//   - ctx *gin.Context
 //   - wallet *domain.WalletRecord
-func (_e *MockWalletRecordRepo_Expecter) Create(wallet interface{}) *MockWalletRecordRepo_Create_Call {
-	return &MockWalletRecordRepo_Create_Call{Call: _e.mock.On("Create", wallet)}
+func (_e *MockWalletRecordRepo_Expecter) Create(ctx interface{}, wallet interface{}) *MockWalletRecordRepo_Create_Call {
+	return &MockWalletRecordRepo_Create_Call{Call: _e.mock.On("Create", ctx, wallet)}
 }
 
-func (_c *MockWalletRecordRepo_Create_Call) Run(run func(wallet *domain.WalletRecord)) *MockWalletRecordRepo_Create_Call {
+func (_c *MockWalletRecordRepo_Create_Call) Run(run func(ctx *gin.Context, wallet *domain.WalletRecord)) *MockWalletRecordRepo_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*domain.WalletRecord))
+		run(args[0].(*gin.Context), args[1].(*domain.WalletRecord))
 	})
 	return _c
 }
@@ -66,14 +69,14 @@ func (_c *MockWalletRecordRepo_Create_Call) Return(_a0 error) *MockWalletRecordR
 	return _c
 }
 
-func (_c *MockWalletRecordRepo_Create_Call) RunAndReturn(run func(*domain.WalletRecord) error) *MockWalletRecordRepo_Create_Call {
+func (_c *MockWalletRecordRepo_Create_Call) RunAndReturn(run func(*gin.Context, *domain.WalletRecord) error) *MockWalletRecordRepo_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// Get provides a mock function with given fields: id
-func (_m *MockWalletRecordRepo) Get(id uint) (*domain.WalletRecord, error) {
-	ret := _m.Called(id)
+// Get provides a mock function with given fields: ctx, id
+func (_m *MockWalletRecordRepo) Get(ctx *gin.Context, id uint) (*domain.WalletRecord, error) {
+	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Get")
@@ -81,19 +84,19 @@ func (_m *MockWalletRecordRepo) Get(id uint) (*domain.WalletRecord, error) {
 
 	var r0 *domain.WalletRecord
 	var r1 error
-	if rf, ok := ret.Get(0).(func(uint) (*domain.WalletRecord, error)); ok {
-		return rf(id)
+	if rf, ok := ret.Get(0).(func(*gin.Context, uint) (*domain.WalletRecord, error)); ok {
+		return rf(ctx, id)
 	}
-	if rf, ok := ret.Get(0).(func(uint) *domain.WalletRecord); ok {
-		r0 = rf(id)
+	if rf, ok := ret.Get(0).(func(*gin.Context, uint) *domain.WalletRecord); ok {
+		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*domain.WalletRecord)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(uint) error); ok {
-		r1 = rf(id)
+	if rf, ok := ret.Get(1).(func(*gin.Context, uint) error); ok {
+		r1 = rf(ctx, id)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -107,14 +110,15 @@ type MockWalletRecordRepo_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
+//   - ctx *gin.Context
 //   - id uint
-func (_e *MockWalletRecordRepo_Expecter) Get(id interface{}) *MockWalletRecordRepo_Get_Call {
-	return &MockWalletRecordRepo_Get_Call{Call: _e.mock.On("Get", id)}
+func (_e *MockWalletRecordRepo_Expecter) Get(ctx interface{}, id interface{}) *MockWalletRecordRepo_Get_Call {
+	return &MockWalletRecordRepo_Get_Call{Call: _e.mock.On("Get", ctx, id)}
 }
 
-func (_c *MockWalletRecordRepo_Get_Call) Run(run func(id uint)) *MockWalletRecordRepo_Get_Call {
+func (_c *MockWalletRecordRepo_Get_Call) Run(run func(ctx *gin.Context, id uint)) *MockWalletRecordRepo_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(uint))
+		run(args[0].(*gin.Context), args[1].(uint))
 	})
 	return _c
 }
@@ -124,7 +128,7 @@ func (_c *MockWalletRecordRepo_Get_Call) Return(_a0 *domain.WalletRecord, _a1 er
 	return _c
 }
 
-func (_c *MockWalletRecordRepo_Get_Call) RunAndReturn(run func(uint) (*domain.WalletRecord, error)) *MockWalletRecordRepo_Get_Call {
+func (_c *MockWalletRecordRepo_Get_Call) RunAndReturn(run func(*gin.Context, uint) (*domain.WalletRecord, error)) *MockWalletRecordRepo_Get_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -333,3 +333,67 @@ func (u *WalletUseCase) IncrementMoney(ctx *gin.Context, walletId uint, userId s
 	})
 
 }
+
+func (u *WalletUseCase) UpdateWalletByRecord(ctx *gin.Context, record *domain.WalletRecord) error {
+
+	db := ctx.MustGet("DB").(*gorm.DB)
+	return db.Transaction(func(tx *gorm.DB) error {
+		txWalletRepo := u.walletRepo.WithTrx(tx)
+
+		// get record
+		wallet, err := txWalletRepo.GetWalletWithLock(ctx, record.WalletId)
+		if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+			// update record , status = failed
+			record.Status = domain.WALLET_RECORD_STATUS_FAILED
+			return u.UpdateWalletRecord(ctx, tx, record)
+		}
+		if err != nil {
+			// go retry
+			return errors.Join(ErrDbFail, err)
+		}
+
+		// check balance
+		if !wallet.CheckDecrementAmount(record.Amount) {
+			record.Status = domain.WALLET_RECORD_STATUS_FAILED
+			return u.UpdateWalletRecord(ctx, tx, record)
+		}
+
+		// update wallet
+		wallet.UpdatedBy = record.CreatedBy
+
+		if updatedCount, err := txWalletRepo.Update(wallet, record.Amount); err != nil || updatedCount == 0 {
+			if err != nil {
+				return errors.Join(ErrDbFail, err)
+			} else {
+				record.Status = domain.WALLET_RECORD_STATUS_FAILED
+				return u.UpdateWalletRecord(ctx, tx, record)
+			}
+		}
+
+		// update record
+		record.Status = domain.WALLET_RECORD_STATUS_SUCCESS
+		record.WalletBalance = wallet.Balance
+
+		return u.UpdateWalletRecord(ctx, tx, record)
+	})
+}
+
+func (u *WalletUseCase) UpdateWalletRecord(ctx *gin.Context, tx *gorm.DB, record *domain.WalletRecord) error {
+	repo := u.walletRecordRepo
+
+	if tx != nil {
+		repo = repo.WithTrx(tx)
+	}
+
+	if updatedCount, err := repo.Update(ctx, record); err != nil || updatedCount == 0 {
+		if err != nil {
+			return errors.Join(ErrDbFail, err)
+		} else {
+			msg := fmt.Sprintf("wallet record not exist:%v", record)
+			log.Println(msg)
+			// no
+			return errors.Join(ErrDataNotExists, errors.New(msg))
+		}
+	}
+	return nil
+}

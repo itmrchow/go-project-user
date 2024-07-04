@@ -2,8 +2,10 @@ package usecase
 
 import (
 	"errors"
+	"net/http/httptest"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/gorm"
@@ -24,11 +26,18 @@ type WalletTestSuite struct {
 	repoWalletMock       *repo.MockWalletRepo
 	repoWalletRecordMock *repo.MockWalletRecordRepo
 	authUser             reqdto.AuthUser
+	ctx                  *gin.Context
 }
 
 func (s *WalletTestSuite) SetupTest() {
 	s.repoWalletMock = &repo.MockWalletRepo{}
+	s.repoWalletRecordMock = &repo.MockWalletRecordRepo{}
 	s.usecase = NewWalletUseCase(s.repoWalletMock, s.repoWalletRecordMock)
+
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+
+	s.ctx = ctx
 }
 
 func (s *WalletTestSuite) Test_CreateWallet_WalletExist() {
@@ -260,6 +269,128 @@ func (s *WalletTestSuite) Test_FindWallet() {
 
 			// assert
 			test.assertFunc(got, err, test.args)
+
+			s.repoWalletMock.AssertExpectations(s.T())
+		})
+	}
+}
+
+func (s *WalletTestSuite) Test_UpdateWalletRecord() {
+	type args struct {
+		ctx    *gin.Context
+		tx     *gorm.DB
+		record *domain.WalletRecord
+	}
+
+	type testcase struct {
+		name       string
+		args       args
+		mockFunc   func(args)
+		assertFunc func(error)
+	}
+
+	tests := []testcase{
+		{
+			name: "db_fail",
+			args: args{
+				ctx:    s.ctx,
+				tx:     nil,
+				record: &domain.WalletRecord{
+					// UserId:     "Jeff",
+					// WalletType: enum.WalletType.PLATFORM,
+					// Currency:   enum.Currency.PHP,
+					// Amount:     10.0,
+					// Balance:    10.0,
+				},
+			},
+			mockFunc: func(a args) {
+				s.repoWalletRecordMock.
+					On("Update",
+						mock.AnythingOfType("*gin.Context"),
+						mock.AnythingOfType("*domain.WalletRecord")).
+					Return(int64(0), gorm.ErrInvalidData).
+					Once()
+			},
+			assertFunc: func(err error) {
+				s.Assert().ErrorIs(err, ErrDbFail)
+			},
+		},
+		{
+			name: "data_not_exist",
+			args: args{
+				ctx:    s.ctx,
+				tx:     nil,
+				record: &domain.WalletRecord{},
+			},
+			mockFunc: func(a args) {
+				s.repoWalletRecordMock.
+					On("Update",
+						mock.AnythingOfType("*gin.Context"),
+						mock.AnythingOfType("*domain.WalletRecord")).
+					Return(int64(0), nil).
+					Once()
+			},
+			assertFunc: func(err error) {
+				s.Assert().ErrorIs(err, ErrDataNotExists)
+			},
+		},
+		{
+			name: "use_tx_success",
+			args: args{
+				ctx:    s.ctx,
+				tx:     &gorm.DB{},
+				record: &domain.WalletRecord{},
+			},
+			mockFunc: func(a args) {
+				s.repoWalletRecordMock.
+					On("WithTrx",
+						mock.AnythingOfType("*gorm.DB")).
+					Return(s.repoWalletMock).
+					Once()
+
+				s.repoWalletRecordMock.
+					On("Update",
+						mock.AnythingOfType("*gin.Context"),
+						mock.AnythingOfType("*domain.WalletRecord")).
+					Return(int64(1), nil).
+					Once()
+			},
+			assertFunc: func(err error) {
+				s.Assert().Nil(err)
+			},
+		},
+		{
+			name: "success",
+			args: args{
+				ctx:    s.ctx,
+				tx:     nil,
+				record: &domain.WalletRecord{},
+			},
+			mockFunc: func(a args) {
+				s.repoWalletRecordMock.
+					On("Update",
+						mock.AnythingOfType("*gin.Context"),
+						mock.AnythingOfType("*domain.WalletRecord")).
+					Return(int64(1), nil).
+					Once()
+			},
+			assertFunc: func(err error) {
+				s.Assert().Nil(err)
+			},
+		},
+	}
+
+	for _, test := range tests {
+
+		s.Run(test.name, func() {
+			// mock
+			test.mockFunc(test.args)
+
+			// execute
+			err := s.usecase.UpdateWalletRecord(test.args.ctx, test.args.tx, test.args.record)
+
+			// assert
+			test.assertFunc(err)
 
 			s.repoWalletMock.AssertExpectations(s.T())
 		})

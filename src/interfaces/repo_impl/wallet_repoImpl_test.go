@@ -138,7 +138,7 @@ func (s *WalletRepoImplTestSuite) TestWalletRepoImpl_Update() {
 		updateWallet.Balance = 30
 		updateWallet.ID = 12
 
-		updatedCount, err := s.repoImpl.Update(updateWallet)
+		updatedCount, err := s.repoImpl.Update(updateWallet, 0)
 
 		testcase.assertFunc(updatedCount, err)
 	})

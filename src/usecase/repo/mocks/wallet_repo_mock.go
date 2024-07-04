@@ -260,6 +260,65 @@ func (_c *MockWalletRepo_GetByUserIdAndWalletType_Call) RunAndReturn(run func(co
 	return _c
 }
 
+// GetWalletWithLock provides a mock function with given fields: ctx, walletId
+func (_m *MockWalletRepo) GetWalletWithLock(ctx context.Context, walletId uint) (*domain.Wallet, error) {
+	ret := _m.Called(ctx, walletId)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWalletWithLock")
+	}
+
+	var r0 *domain.Wallet
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint) (*domain.Wallet, error)); ok {
+		return rf(ctx, walletId)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uint) *domain.Wallet); ok {
+		r0 = rf(ctx, walletId)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Wallet)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uint) error); ok {
+		r1 = rf(ctx, walletId)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockWalletRepo_GetWalletWithLock_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWalletWithLock'
+type MockWalletRepo_GetWalletWithLock_Call struct {
+	*mock.Call
+}
+
+// GetWalletWithLock is a helper method to define mock.On call
+//   - ctx context.Context
+//   - walletId uint
+func (_e *MockWalletRepo_Expecter) GetWalletWithLock(ctx interface{}, walletId interface{}) *MockWalletRepo_GetWalletWithLock_Call {
+	return &MockWalletRepo_GetWalletWithLock_Call{Call: _e.mock.On("GetWalletWithLock", ctx, walletId)}
+}
+
+func (_c *MockWalletRepo_GetWalletWithLock_Call) Run(run func(ctx context.Context, walletId uint)) *MockWalletRepo_GetWalletWithLock_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint))
+	})
+	return _c
+}
+
+func (_c *MockWalletRepo_GetWalletWithLock_Call) Return(_a0 *domain.Wallet, _a1 error) *MockWalletRepo_GetWalletWithLock_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockWalletRepo_GetWalletWithLock_Call) RunAndReturn(run func(context.Context, uint) (*domain.Wallet, error)) *MockWalletRepo_GetWalletWithLock_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Migrate provides a mock function with given fields:
 func (_m *MockWalletRepo) Migrate() error {
 	ret := _m.Called()
@@ -305,9 +364,9 @@ func (_c *MockWalletRepo_Migrate_Call) RunAndReturn(run func() error) *MockWalle
 	return _c
 }
 
-// Update provides a mock function with given fields: wallet
-func (_m *MockWalletRepo) Update(wallet *domain.Wallet) (int64, error) {
-	ret := _m.Called(wallet)
+// Update provides a mock function with given fields: wallet, amount
+func (_m *MockWalletRepo) Update(wallet *domain.Wallet, amount float64) (int64, error) {
+	ret := _m.Called(wallet, amount)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Update")
@@ -315,17 +374,17 @@ func (_m *MockWalletRepo) Update(wallet *domain.Wallet) (int64, error) {
 
 	var r0 int64
 	var r1 error
-	if rf, ok := ret.Get(0).(func(*domain.Wallet) (int64, error)); ok {
-		return rf(wallet)
+	if rf, ok := ret.Get(0).(func(*domain.Wallet, float64) (int64, error)); ok {
+		return rf(wallet, amount)
 	}
-	if rf, ok := ret.Get(0).(func(*domain.Wallet) int64); ok {
-		r0 = rf(wallet)
+	if rf, ok := ret.Get(0).(func(*domain.Wallet, float64) int64); ok {
+		r0 = rf(wallet, amount)
 	} else {
 		r0 = ret.Get(0).(int64)
 	}
 
-	if rf, ok := ret.Get(1).(func(*domain.Wallet) error); ok {
-		r1 = rf(wallet)
+	if rf, ok := ret.Get(1).(func(*domain.Wallet, float64) error); ok {
+		r1 = rf(wallet, amount)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -340,13 +399,14 @@ type MockWalletRepo_Update_Call struct {
 
 // Update is a helper method to define mock.On call
 //   - wallet *domain.Wallet
-func (_e *MockWalletRepo_Expecter) Update(wallet interface{}) *MockWalletRepo_Update_Call {
-	return &MockWalletRepo_Update_Call{Call: _e.mock.On("Update", wallet)}
+//   - amount float64
+func (_e *MockWalletRepo_Expecter) Update(wallet interface{}, amount interface{}) *MockWalletRepo_Update_Call {
+	return &MockWalletRepo_Update_Call{Call: _e.mock.On("Update", wallet, amount)}
 }
 
-func (_c *MockWalletRepo_Update_Call) Run(run func(wallet *domain.Wallet)) *MockWalletRepo_Update_Call {
+func (_c *MockWalletRepo_Update_Call) Run(run func(wallet *domain.Wallet, amount float64)) *MockWalletRepo_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*domain.Wallet))
+		run(args[0].(*domain.Wallet), args[1].(float64))
 	})
 	return _c
 }
@@ -356,7 +416,7 @@ func (_c *MockWalletRepo_Update_Call) Return(_a0 int64, _a1 error) *MockWalletRe
 	return _c
 }
 
-func (_c *MockWalletRepo_Update_Call) RunAndReturn(run func(*domain.Wallet) (int64, error)) *MockWalletRepo_Update_Call {
+func (_c *MockWalletRepo_Update_Call) RunAndReturn(run func(*domain.Wallet, float64) (int64, error)) *MockWalletRepo_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }

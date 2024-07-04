@@ -42,7 +42,7 @@ func (s *WalletRecordRepoImplTestSuite) TestWalletRecordRepoImpl_Create() {
 		RecordName:  "轉入測試",
 		Currency:    "PHP",
 		Amount:      50.5,
-		Status:      domain.WALLETRECORDSTATUS_PENDING,
+		Status:      domain.WALLET_RECORD_STATUS_PENDING,
 		Description: "Description test",
 	}
 

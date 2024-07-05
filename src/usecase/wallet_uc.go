@@ -19,10 +19,21 @@ import (
 type WalletUseCase struct {
 	walletRepo       repo.WalletRepo
 	walletRecordRepo repo.WalletRecordRepo
+	operation        WalletOperation
+}
+
+type WalletOperation interface {
+	CreateWalletRecord(ctx *gin.Context, walletId uint, amount float64, eventName string, depiction string, updateUserId string) (*domain.WalletRecord, error)
+	UpdateWalletByRecord(ctx *gin.Context, tx *gorm.DB, record *domain.WalletRecord) error
+	UpdateWalletRecord(ctx *gin.Context, tx *gorm.DB, record *domain.WalletRecord) error
 }
 
 func NewWalletUseCase(walletRepo repo.WalletRepo, walletRecord repo.WalletRecordRepo) *WalletUseCase {
-	return &WalletUseCase{walletRepo: walletRepo, walletRecordRepo: walletRecord}
+
+	u := &WalletUseCase{walletRepo: walletRepo, walletRecordRepo: walletRecord}
+	u.operation = u
+
+	return u
 }
 
 type CreateWalletInput struct {
@@ -191,39 +202,28 @@ func (u *WalletUseCase) TransferFunds(ctx *gin.Context, input *TransferFundsInpu
 }
 
 // DecrementMoney
-func (u *WalletUseCase) DecrementMoney(ctx *gin.Context, walletId uint, amount float64, eventName string, depiction string, updateUserId string) error {
+func (u *WalletUseCase) DecrementMoney(ctx *gin.Context, walletId uint, amount float64, eventName string, description string, updateUserId string) error {
 	amount = amount * -1
-	record, err := u.CreateWalletRecord(ctx, walletId, amount, eventName, depiction, updateUserId)
-	if err != nil {
-		return nil
-	}
 
-	db := ctx.MustGet("DB").(*gorm.DB)
-	return db.Transaction(func(tx *gorm.DB) error {
-
-		if err := u.UpdateWalletByRecord(ctx, tx, record); err != nil {
-			return err
-		}
-
-		return u.UpdateWalletRecord(ctx, tx, record)
-	})
+	return u.IncrementMoney(ctx, walletId, amount, eventName, description, updateUserId)
 }
 
 // IncrementMoney
 func (u *WalletUseCase) IncrementMoney(ctx *gin.Context, walletId uint, amount float64, eventName string, depiction string, updateUserId string) error {
-	record, err := u.CreateWalletRecord(ctx, walletId, amount, eventName, depiction, updateUserId)
+
+	record, err := u.operation.CreateWalletRecord(ctx, walletId, amount, eventName, depiction, updateUserId)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	db := ctx.MustGet("DB").(*gorm.DB)
 	return db.Transaction(func(tx *gorm.DB) error {
 
-		if err := u.UpdateWalletByRecord(ctx, tx, record); err != nil {
+		if err := u.operation.UpdateWalletByRecord(ctx, tx, record); err != nil {
 			return err
 		}
 
-		return u.UpdateWalletRecord(ctx, tx, record)
+		return u.operation.UpdateWalletRecord(ctx, tx, record)
 	})
 }
 

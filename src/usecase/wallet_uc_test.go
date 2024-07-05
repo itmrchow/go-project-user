@@ -420,13 +420,6 @@ func (s *WalletTestSuite) Test_UpdateWalletByRecord() {
 		assertFunc func(error, args)
 	}
 
-	myMockUc := MockUc_UpdateWalletByRecord{
-		WalletUseCase: WalletUseCase{
-			walletRepo:       s.repoWalletMock,
-			walletRecordRepo: s.repoWalletRecordMock,
-		},
-	}
-
 	tests := []testcase{
 		{
 			name: "get_wallet_not_exist",
@@ -637,13 +630,13 @@ func (s *WalletTestSuite) Test_UpdateWalletByRecord() {
 			test.mockFunc(test.args)
 
 			// execute
-			err := myMockUc.UpdateWalletByRecord(test.args.ctx, test.args.tx, test.args.record)
+			err := s.usecase.UpdateWalletByRecord(test.args.ctx, test.args.tx, test.args.record)
 
 			// assert
 			test.assertFunc(err, test.args)
 
 			s.repoWalletMock.AssertExpectations(s.T())
-			myMockUc.AssertExpectations(s.T())
+			s.repoWalletRecordMock.AssertExpectations(s.T())
 		})
 	}
 }

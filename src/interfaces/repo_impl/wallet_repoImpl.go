@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"itmrchow/go-project/user/src/domain"
 	"itmrchow/go-project/user/src/infrastructure/database"
@@ -53,8 +54,13 @@ func (w *WalletRepoImpl) GetByUserIdAndWalletType(ctx context.Context, userId, w
 	return &wallet, result.Error
 }
 
-func (w *WalletRepoImpl) Update(wallet *domain.Wallet) (int64, error) {
-	result := w.DB.Model(&domain.Wallet{}).Where("id = ?", wallet.ID).Updates(wallet)
+func (w *WalletRepoImpl) Update(wallet *domain.Wallet, amount float64) (int64, error) {
+	result := w.DB.Model(&domain.Wallet{}).
+		Where("id = ?", wallet.ID).
+		Updates(map[string]interface{}{
+			"balance":    gorm.Expr("balance + ?", amount),
+			"updated_by": wallet.UpdatedBy,
+		})
 	return result.RowsAffected, result.Error
 }
 
@@ -72,3 +78,13 @@ func (w *WalletRepoImpl) WithTrx(trxHandle *gorm.DB) repo.WalletRepo {
 func (w *WalletRepoImpl) Migrate() error {
 	panic("TODO: Implement")
 }
+
+func (w *WalletRepoImpl) GetWalletWithLock(ctx context.Context, walletId uint) (*domain.Wallet, error) {
+	var wallet = &domain.Wallet{}
+	result := w.DB.Clauses(clause.Locking{Strength: "UPDATE"}).First(wallet, walletId)
+	return wallet, result.Error
+}
+
+// func (w *WalletRepoImpl) GetWalletId(ctx context.Context, userId string, walletType string) (uint, error) {
+// 	panic("TODO: Implement")
+// }

@@ -11,12 +11,14 @@ type WalletRecord struct {
 	WalletBalance float64            `gorm:"type:decimal;"`
 	Status        WalletRecordStatus `gorm:"type:int;not null"`
 	Description   string             `gorm:"type:longtext"`
+	// TODO: retry count
+	// TODO: msg
 }
 
 type WalletRecordStatus uint
 
 const (
-	WALLET_RECORD_STATUS_PENDING = iota
+	WALLET_RECORD_STATUS_PENDING WalletRecordStatus = iota
 	WALLET_RECORD_STATUS_SUCCESS
 	WALLET_RECORD_STATUS_FAILED
 )

@@ -640,3 +640,164 @@ func (s *WalletTestSuite) Test_UpdateWalletByRecord() {
 		})
 	}
 }
+
+func (s *WalletTestSuite) Test_CreateWalletRecord() {
+	type args struct {
+		ctx          *gin.Context
+		walletId     uint
+		amount       float64
+		eventName    string
+		depiction    string
+		updateUserId string
+	}
+	type testcase struct {
+		name       string
+		args       args
+		mockFunc   func(args)
+		assertFunc func(*domain.WalletRecord, error, args)
+	}
+
+	tests := []testcase{
+		{
+			name: "get_wallet_not_exist",
+			args: args{
+				walletId: 13,
+			},
+			mockFunc: func(a args) {
+				s.repoWalletMock.
+					On("Get",
+						mock.AnythingOfType("*gin.Context"),
+						a.walletId,
+					).Return(nil, gorm.ErrRecordNotFound).Once()
+
+			},
+			assertFunc: func(record *domain.WalletRecord, err error, args args) {
+				s.Assert().Nil(record)
+				s.Assert().ErrorIs(err, ErrDataNotExists)
+			},
+		},
+		{
+			name: "get_wallet_db_fail",
+			args: args{
+				walletId: 13,
+			},
+			mockFunc: func(a args) {
+				s.repoWalletMock.
+					On("Get",
+						mock.AnythingOfType("*gin.Context"),
+						a.walletId,
+					).Return(nil, gorm.ErrInvalidDB).Once()
+
+			},
+			assertFunc: func(record *domain.WalletRecord, err error, args args) {
+				s.Assert().Nil(record)
+				s.Assert().ErrorIs(err, ErrDbFail)
+			},
+		},
+		{
+			name: "create_record_fail",
+			args: args{
+				walletId:     13,
+				amount:       54,
+				eventName:    "轉入",
+				depiction:    "AAA轉入",
+				updateUserId: "AAA",
+			},
+			mockFunc: func(a args) {
+				s.repoWalletMock.
+					On("Get",
+						mock.AnythingOfType("*gin.Context"),
+						a.walletId,
+					).Return(
+					&domain.Wallet{
+						Currency: "PHP",
+						DefaultModel: domain.DefaultModel{
+							Model: gorm.Model{
+								ID: a.walletId,
+							},
+						},
+					}, nil).Once()
+
+				s.repoWalletRecordMock.
+					On("Create",
+						mock.AnythingOfType("*gin.Context"),
+						mock.MatchedBy(func(record *domain.WalletRecord) bool {
+							return record.WalletId == a.walletId &&
+								record.Currency == "PHP" &&
+								record.RecordName == a.eventName &&
+								record.Status == domain.WALLET_RECORD_STATUS_PENDING &&
+								record.Description == a.depiction
+						}),
+					).Return(gorm.ErrInvalidDB)
+			},
+			assertFunc: func(record *domain.WalletRecord, err error, args args) {
+				s.Assert().Nil(record)
+				s.Assert().ErrorIs(err, ErrDbFail)
+			},
+		},
+		{
+			name: "create_record_success",
+			args: args{
+				walletId:     13,
+				amount:       54,
+				eventName:    "轉入",
+				depiction:    "AAA轉入",
+				updateUserId: "AAA",
+			},
+			mockFunc: func(a args) {
+				s.repoWalletMock.
+					On("Get",
+						mock.AnythingOfType("*gin.Context"),
+						a.walletId,
+					).Return(
+					&domain.Wallet{
+						Currency: "PHP",
+						DefaultModel: domain.DefaultModel{
+							Model: gorm.Model{
+								ID: a.walletId,
+							},
+						},
+					}, nil).Once()
+
+				s.repoWalletRecordMock.
+					On("Create",
+						mock.AnythingOfType("*gin.Context"),
+						mock.MatchedBy(func(record *domain.WalletRecord) bool {
+							return record.WalletId == a.walletId &&
+								record.Currency == "PHP" &&
+								record.RecordName == a.eventName &&
+								record.Status == domain.WALLET_RECORD_STATUS_PENDING &&
+								record.Description == a.depiction
+						}),
+					).Return(nil)
+			},
+			assertFunc: func(record *domain.WalletRecord, err error, a args) {
+				s.Assert().Nil(err)
+				s.Assert().Equal(record.WalletId, a.walletId)
+				s.Assert().Equal(record.Currency, "PHP")
+				s.Assert().Equal(record.RecordName, a.eventName)
+				s.Assert().Equal(record.Status, domain.WALLET_RECORD_STATUS_PENDING)
+				s.Assert().Equal(record.Description, a.depiction)
+			},
+		},
+	}
+
+	s.ctx.Set("DB", &gorm.DB{})
+
+	for _, test := range tests {
+
+		s.Run(test.name, func() {
+			// mock
+			test.mockFunc(test.args)
+
+			// execute
+			record, err := s.usecase.CreateWalletRecord(test.args.ctx, test.args.walletId, test.args.amount, test.args.eventName, test.args.depiction, test.args.updateUserId)
+
+			// assert
+			test.assertFunc(record, err, test.args)
+
+			s.repoWalletMock.AssertExpectations(s.T())
+			s.repoWalletRecordMock.AssertExpectations(s.T())
+		})
+	}
+}

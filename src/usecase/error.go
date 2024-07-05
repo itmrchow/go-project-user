@@ -13,6 +13,8 @@ var (
 
 	ErrUserNotExists = errors.New("user not exists")
 
+	ErrDataNotExists = errors.New("data not exists")
+
 	ErrUnauthorized = errors.New("unauthorized")
 
 	ErrDbFail = errors.New("db fail")

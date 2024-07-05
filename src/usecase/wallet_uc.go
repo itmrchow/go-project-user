@@ -192,48 +192,50 @@ func (u *WalletUseCase) TransferFunds(ctx *gin.Context, input *TransferFundsInpu
 
 // DecrementMoney
 func (u *WalletUseCase) DecrementMoney(ctx *gin.Context, walletId uint, amount float64, eventName string, depiction string, updateUserId string) error {
-
-	// get wallet
-	wallet, err := u.walletRepo.Get(ctx, walletId)
+	amount = amount * -1
+	record, err := u.CreateWalletRecord(ctx, walletId, amount, eventName, depiction, updateUserId)
 	if err != nil {
-		return errors.Join(ErrDbFail, err)
-	}
-
-	// check amount
-	if !wallet.CheckDecrementAmount(amount) {
-		return errors.Join(ErrPaymentRequired, errors.New("invalid amount"))
-	}
-
-	// create wallet record
-	walletRecord := &domain.WalletRecord{
-		DefaultModel: domain.DefaultModel{
-			CreatedBy: updateUserId,
-			UpdatedBy: updateUserId,
-		},
-		WalletId:    wallet.ID,
-		RecordName:  eventName,
-		Currency:    wallet.Currency,
-		Amount:      amount * -1,
-		Status:      domain.WALLET_RECORD_STATUS_PENDING,
-		Description: depiction,
-	}
-
-	if err := u.walletRecordRepo.Create(ctx, walletRecord); err != nil {
-		return errors.Join(ErrDbFail, err)
+		return nil
 	}
 
 	db := ctx.MustGet("DB").(*gorm.DB)
 	return db.Transaction(func(tx *gorm.DB) error {
-		return u.UpdateWalletByRecord(ctx, tx, walletRecord)
+
+		if err := u.UpdateWalletByRecord(ctx, tx, record); err != nil {
+			return err
+		}
+
+		return u.UpdateWalletRecord(ctx, tx, record)
 	})
 }
 
 // IncrementMoney
 func (u *WalletUseCase) IncrementMoney(ctx *gin.Context, walletId uint, amount float64, eventName string, depiction string, updateUserId string) error {
+	record, err := u.CreateWalletRecord(ctx, walletId, amount, eventName, depiction, updateUserId)
+	if err != nil {
+		return nil
+	}
+
+	db := ctx.MustGet("DB").(*gorm.DB)
+	return db.Transaction(func(tx *gorm.DB) error {
+
+		if err := u.UpdateWalletByRecord(ctx, tx, record); err != nil {
+			return err
+		}
+
+		return u.UpdateWalletRecord(ctx, tx, record)
+	})
+}
+
+func (u *WalletUseCase) CreateWalletRecord(ctx *gin.Context, walletId uint, amount float64, eventName string, depiction string, updateUserId string) (*domain.WalletRecord, error) {
 	// get wallet
 	wallet, err := u.walletRepo.Get(ctx, walletId)
 	if err != nil {
-		return errors.Join(ErrDbFail, err)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.Join(ErrDataNotExists, err)
+		} else {
+			return nil, errors.Join(ErrDbFail, err)
+		}
 	}
 
 	// create wallet record
@@ -245,25 +247,16 @@ func (u *WalletUseCase) IncrementMoney(ctx *gin.Context, walletId uint, amount f
 		WalletId:    wallet.ID,
 		RecordName:  eventName,
 		Currency:    wallet.Currency,
-		Amount:      amount * -1,
+		Amount:      amount,
 		Status:      domain.WALLET_RECORD_STATUS_PENDING,
 		Description: depiction,
 	}
 
 	if err := u.walletRecordRepo.Create(ctx, walletRecord); err != nil {
-		return errors.Join(ErrDbFail, err)
+		return nil, errors.Join(ErrDbFail, err)
 	}
 
-	db := ctx.MustGet("DB").(*gorm.DB)
-	return db.Transaction(func(tx *gorm.DB) error {
-
-		if err := u.UpdateWalletByRecord(ctx, tx, walletRecord); err != nil {
-			return err
-		}
-
-		return u.UpdateWalletRecord(ctx, tx, walletRecord)
-	})
-
+	return walletRecord, nil
 }
 
 func (u *WalletUseCase) UpdateWalletByRecord(ctx *gin.Context, tx *gorm.DB, record *domain.WalletRecord) error {

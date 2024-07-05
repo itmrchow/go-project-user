@@ -345,7 +345,7 @@ func (s *WalletTestSuite) Test_UpdateWalletRecord() {
 				s.repoWalletRecordMock.
 					On("WithTrx",
 						mock.AnythingOfType("*gorm.DB")).
-					Return(s.repoWalletMock).
+					Return(s.repoWalletRecordMock).
 					Once()
 
 				s.repoWalletRecordMock.
@@ -392,7 +392,258 @@ func (s *WalletTestSuite) Test_UpdateWalletRecord() {
 			// assert
 			test.assertFunc(err)
 
+			s.repoWalletRecordMock.AssertExpectations(s.T())
+		})
+	}
+}
+
+type MockUc_UpdateWalletByRecord struct {
+	mock.Mock
+	WalletUseCase
+}
+
+func (m *MockUc_UpdateWalletByRecord) UpdateWalletRecord(ctx *gin.Context, tx *gorm.DB, record *domain.WalletRecord) error {
+	args := m.Called(ctx, tx, record)
+	return args.Error(0)
+}
+
+func (s *WalletTestSuite) Test_UpdateWalletByRecord() {
+	type args struct {
+		ctx    *gin.Context
+		tx     *gorm.DB
+		record *domain.WalletRecord
+	}
+	type testcase struct {
+		name       string
+		args       args
+		mockFunc   func(args)
+		assertFunc func(error, args)
+	}
+
+	myMockUc := MockUc_UpdateWalletByRecord{
+		WalletUseCase: WalletUseCase{
+			walletRepo:       s.repoWalletMock,
+			walletRecordRepo: s.repoWalletRecordMock,
+		},
+	}
+
+	tests := []testcase{
+		{
+			name: "get_wallet_not_exist",
+			args: args{
+				ctx:    s.ctx,
+				record: &domain.WalletRecord{
+					// UserId:     "Jeff",
+					// WalletType: enum.WalletType.PLATFORM,
+					// Currency:   enum.Currency.PHP,
+					// Amount:     10.0,
+					// Balance:    10.0,
+				},
+			},
+			mockFunc: func(a args) {
+				s.repoWalletMock.
+					On("WithTrx",
+						mock.AnythingOfType("*gorm.DB")).
+					Return(s.repoWalletMock).
+					Once()
+
+				s.repoWalletMock.
+					On("GetWalletWithLock",
+						mock.AnythingOfType("*gin.Context"),
+						mock.AnythingOfType("uint"),
+					).
+					Return(nil, gorm.ErrRecordNotFound).
+					Once()
+
+			},
+			assertFunc: func(err error, args args) {
+				s.Assert().Nil(err)
+				s.Assert().Equal(args.record.Status, domain.WALLET_RECORD_STATUS_FAILED)
+			},
+		},
+		{
+			name: "get_wallet_db_fail",
+			args: args{
+				ctx:    s.ctx,
+				record: &domain.WalletRecord{
+					// UserId:     "Jeff",
+					// WalletType: enum.WalletType.PLATFORM,
+					// Currency:   enum.Currency.PHP,
+					// Amount:     10.0,
+					// Balance:    10.0,
+				},
+			},
+			mockFunc: func(a args) {
+				s.repoWalletMock.
+					On("WithTrx",
+						mock.AnythingOfType("*gorm.DB")).
+					Return(s.repoWalletMock).
+					Once()
+
+				s.repoWalletMock.
+					On("GetWalletWithLock",
+						mock.AnythingOfType("*gin.Context"),
+						mock.AnythingOfType("uint"),
+					).
+					Return(nil, gorm.ErrInvalidDB).
+					Once()
+
+			},
+			assertFunc: func(err error, args args) {
+				s.Assert().ErrorIs(err, ErrDbFail)
+			},
+		},
+		{
+			name: "check_decrement_amount_fail",
+			args: args{
+				ctx: s.ctx,
+				record: &domain.WalletRecord{
+					Amount: -10.0,
+				},
+			},
+			mockFunc: func(a args) {
+				s.repoWalletMock.
+					On("WithTrx",
+						mock.AnythingOfType("*gorm.DB")).
+					Return(s.repoWalletMock).
+					Once()
+
+				s.repoWalletMock.
+					On("GetWalletWithLock",
+						mock.AnythingOfType("*gin.Context"),
+						mock.AnythingOfType("uint"),
+					).
+					Return(&domain.Wallet{
+						Balance: 3.5,
+					}, nil).
+					Once()
+
+			},
+			assertFunc: func(err error, args args) {
+				s.Assert().Nil(err)
+				s.Assert().Equal(args.record.Status, domain.WALLET_RECORD_STATUS_FAILED)
+			},
+		},
+		{
+			name: "update_db_fail",
+			args: args{
+				ctx: s.ctx,
+				record: &domain.WalletRecord{
+					Amount: -2.0,
+				},
+			},
+			mockFunc: func(a args) {
+				s.repoWalletMock.
+					On("WithTrx",
+						mock.AnythingOfType("*gorm.DB")).
+					Return(s.repoWalletMock).
+					Once()
+
+				s.repoWalletMock.
+					On("GetWalletWithLock",
+						mock.AnythingOfType("*gin.Context"),
+						mock.AnythingOfType("uint"),
+					).
+					Return(&domain.Wallet{
+						Balance: 3.5,
+					}, nil).
+					Once()
+
+				s.repoWalletMock.
+					On("Update",
+						mock.AnythingOfType("*domain.Wallet"),
+						mock.AnythingOfType("float64"),
+					).
+					Return(int64(0), gorm.ErrInvalidDB).
+					Once()
+
+			},
+			assertFunc: func(err error, args args) {
+				s.Assert().ErrorIs(err, ErrDbFail)
+			},
+		},
+		{
+			name: "update_wallet_count_zero",
+			args: args{
+				ctx: s.ctx,
+				record: &domain.WalletRecord{
+					WalletId: 1,
+					Amount:   -2.0,
+				},
+			},
+			mockFunc: func(a args) {
+				s.repoWalletMock.
+					On("WithTrx", mock.AnythingOfType("*gorm.DB")).
+					Return(s.repoWalletMock).
+					Once()
+
+				s.repoWalletMock.
+					On("GetWalletWithLock", mock.AnythingOfType("*gin.Context"), mock.AnythingOfType("uint")).
+					Return(&domain.Wallet{
+						Balance: 3.5,
+					}, nil).
+					Once()
+
+				s.repoWalletMock.
+					On("Update", mock.AnythingOfType("*domain.Wallet"), mock.AnythingOfType("float64")).
+					Return(int64(0), nil).
+					Once()
+			},
+			assertFunc: func(err error, args args) {
+				s.Assert().NoError(err)
+				s.Assert().Equal(domain.WALLET_RECORD_STATUS_FAILED, args.record.Status)
+			},
+		},
+		{
+			name: "update_wallet_success",
+			args: args{
+				ctx: s.ctx,
+				record: &domain.WalletRecord{
+					WalletId: 1,
+					Amount:   -2.0,
+				},
+			},
+			mockFunc: func(a args) {
+				s.repoWalletMock.
+					On("WithTrx", mock.AnythingOfType("*gorm.DB")).
+					Return(s.repoWalletMock).
+					Once()
+
+				s.repoWalletMock.
+					On("GetWalletWithLock", mock.AnythingOfType("*gin.Context"), mock.AnythingOfType("uint")).
+					Return(&domain.Wallet{
+						Balance: 3.5,
+					}, nil).
+					Once()
+
+				s.repoWalletMock.
+					On("Update", mock.AnythingOfType("*domain.Wallet"), mock.AnythingOfType("float64")).
+					Return(int64(1), nil).
+					Once()
+			},
+			assertFunc: func(err error, args args) {
+				s.Assert().NoError(err)
+				s.Assert().Equal(domain.WALLET_RECORD_STATUS_SUCCESS, args.record.Status)
+			},
+		},
+	}
+
+	s.ctx.Set("DB", &gorm.DB{})
+
+	for _, test := range tests {
+
+		s.Run(test.name, func() {
+			// mock
+			test.mockFunc(test.args)
+
+			// execute
+			err := myMockUc.UpdateWalletByRecord(test.args.ctx, test.args.tx, test.args.record)
+
+			// assert
+			test.assertFunc(err, test.args)
+
 			s.repoWalletMock.AssertExpectations(s.T())
+			myMockUc.AssertExpectations(s.T())
 		})
 	}
 }

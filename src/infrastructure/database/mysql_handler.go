@@ -12,9 +12,7 @@ import (
 )
 
 const (
-	ViperKey          = "mysql"
-	ViperIsShowLogKey = "mysql.isShowLog"
-	DnsStr            = "%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local"
+	DnsStr = "%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local"
 )
 
 type DbConfig struct {
@@ -47,11 +45,14 @@ func NewMySqlHandler() (*MysqlHandler, error) {
 
 func (h *MysqlHandler) Connect() error {
 
-	if err := viper.UnmarshalKey(ViperKey, &h.config); err != nil {
-		panic("read config error: " + err.Error())
+	h.config = DbConfig{
+		Host:      viper.GetString("mysql.host"),
+		Port:      viper.GetInt("mysql.port"),
+		User:      viper.GetString("mysql.user"),
+		Password:  viper.GetString("mysql.password"),
+		Name:      viper.GetString("mysql.name"),
+		IsShowLog: viper.GetBool("mysql.isShowLog"),
 	}
-
-	h.config.IsShowLog = viper.GetBool(ViperIsShowLogKey)
 
 	dsn := fmt.Sprintf(
 		DnsStr,

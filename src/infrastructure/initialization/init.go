@@ -17,8 +17,14 @@ func SetConfig() {
 		panic(err.Error())
 	}
 
-	prefix := path[:(strings.Index(path, "go-project-user"))]
-	path = prefix + "go-project-user/config"
+	index := strings.Index(path, "go-project-user")
+
+	if index > 0 {
+		prefix := path[:(strings.Index(path, "go-project-user"))]
+		path = prefix + "go-project-user/config"
+	} else {
+		path += "/config"
+	}
 
 	viper.SetConfigName("app")
 	viper.SetConfigType("yaml")

@@ -1,16 +1,44 @@
 version: '3.7'
 
+networks:
+  replication_network:
+
 services:
-  mysql:
+  mysql_master:
+    image: mysql:8.0
     platform: linux/x86_64
-    image: mysql:5.7
+    container_name: mysql-master
     ports:
       - '3306:3306'
-    volumes:
-      - mysql-data:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=abc123!
-      - MYSQL_DATABASE=membership
+      - MYSQL_DATABASE=account_local
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin
+      - MYSQL_REPLICATION_USER=admin
+      - MYSQL_REPLICATION_PASSWORD=admin
+    volumes:
+      - type: bind
+        source: ./mysql-config/mysql-master.cnf
+        target: /etc/my.cnf
+    networks:
+      - replication_network
 
-volumes:
-  mysql-data:
+  mysql-replica1:
+    image: mysql:8.0
+    platform: linux/x86_64
+    container_name: mysql-replica1
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=abc123!
+      - MYSQL_DATABASE=account_local
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin
+      - MYSQL_MASTER_HOST=mysql-master
+    volumes:
+      - type: bind
+        source: ./mysql-config/mysql-slave-1.cnf
+        target: /etc/my.cnf
+    networks:
+      - replication_network
